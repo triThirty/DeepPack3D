@@ -1,8 +1,8 @@
 import numpy as np
-from conveyor import Conveyor, rotated_sizes
-from SpacePartitioner import SpacePartitioner
-from geometry import Cuboid
-from binpacker import *
+from rl.conveyor import Conveyor, rotated_sizes
+from rl.SpacePartitioner import SpacePartitioner
+from rl.geometry import Cuboid
+from rl.binpacker import *
 
 
 class Env:

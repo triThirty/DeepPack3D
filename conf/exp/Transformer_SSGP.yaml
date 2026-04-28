@@ -1,0 +1,5 @@
+algo: "Transformer_SSGP"
+device: cpu
+exploration_ratio: 0.1
+
+score_cutoff: 0.8

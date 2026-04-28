@@ -19,7 +19,7 @@ from tensorflow.keras.layers import (
 from tensorflow.keras.regularizers import l2
 from tensorflow.keras.initializers import orthogonal
 
-from env import *
+from rl.env import *
 import collections, itertools
 
 

@@ -5,10 +5,12 @@ import time
 
 # import seaborn as sns
 import matplotlib.pyplot as plt
+import tensorflow as tf
+from omegaconf import DictConfig, OmegaConf
 
-from env import MultiBinPackerEnv
-from conveyor import FileConveyor, InputConveyor
-from agent import (
+from rl.env import MultiBinPackerEnv
+from rl.conveyor import FileConveyor, InputConveyor
+from rl.agent import (
     bottom_left,
     best_area_fit,
     best_short_side_fit,
@@ -16,7 +18,9 @@ from agent import (
     Agent,
     HeuristicAgent,
 )
-from split_gen import reset_rng
+from rl.split_gen import reset_rng
+
+from gp import gp_main as gp
 
 
 def parse_args():
@@ -25,15 +29,15 @@ def parse_args():
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        "method",
+        "--method",
         metavar="method",
         type=str,
-        choices=["rl", "bl", "baf", "bssf", "blsf"],
-        help='choose the method from {"rl", "bl", "baf", "bssf", "blsf"}.',
+        choices=["rl", "bl", "baf", "bssf", "blsf", "gp"],
+        help='choose the method from {"rl", "bl", "baf", "bssf", "blsf", "gp"}.',
     )
 
     parser.add_argument(
-        "lookahead", metavar="lookahead", type=int, help="choose the lookahead value."
+        "--lookahead", metavar="lookahead", type=int, help="choose the lookahead value."
     )
 
     parser.add_argument(
@@ -167,22 +171,22 @@ def deeppack3d(
         data = np.asarray([utils for utils, n_bins, ep_reward in agent.ep_history])
         # y = np.ones(100)
         # data = np.convolve(data, y, 'valid') / len(y)
-        sns.lineplot(data=data)
+        # sns.lineplot(data=data)
         plt.savefig("./util.jpg")
         plt.show()
 
         data = np.asarray([ep_reward for utils, n_bins, ep_reward in agent.ep_history])
         # y = np.ones(100)
         # data = np.convolve(data, y, 'valid') / len(y)
-        sns.lineplot(data=data)
+        # sns.lineplot(data=data)
         plt.savefig("./ep_reward.jpg")
         plt.show()
 
         import uuid
 
         uid = uuid.uuid4()
-        print(f"saved model at ./{uid}.h5")
-        agent.q_net.save(f"{uid}.h5")
+        print(f"saved model at ./{uid}.keras")
+        agent.q_net.save(f"{uid}.keras")
     else:
         if verbose > 0:
             print(f'Testing with method "{method}" and lookahead {lookahead}...')
@@ -238,24 +242,34 @@ def deeppack3d(
             print(f"Used bins: {used_items}")
 
 
+def merge_conf(cli_conf: DictConfig) -> DictConfig:
+    base_conf = OmegaConf.load("conf/defaults/base.yaml")
+    algo_conf = OmegaConf.load(f"conf/exp/{cli_conf["--method"]}.yaml")
+    conf = OmegaConf.merge(base_conf, algo_conf, cli_conf)
+    return conf
+
+
 def main():
     args = parse_args()
-
     reset_rng(args.seed)
-
-    for _ in deeppack3d(
-        args.method,
-        args.lookahead,
-        n_iterations=args.n_iterations,
-        seed=args.seed,
-        train=args.train,
-        verbose=args.verbose,
-        data=args.data,
-        path=args.path,
-        visualize=args.visualize,
-        batch_size=args.batch_size,
-    ):
-        pass
+    if args.method == "gp":
+        cli_conf = OmegaConf.from_cli()  # Default to KNN if not specified
+        cfg = merge_conf(cli_conf)
+        gp.main(cfg)
+    else:
+        for _ in deeppack3d(
+            args.method,
+            args.lookahead,
+            n_iterations=args.n_iterations,
+            seed=args.seed,
+            train=args.train,
+            verbose=args.verbose,
+            data=args.data,
+            path=args.path,
+            visualize=args.visualize,
+            batch_size=args.batch_size,
+        ):
+            pass
 
 
 if __name__ == "__main__":

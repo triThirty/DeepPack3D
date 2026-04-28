@@ -1,0 +1,9 @@
+# defaults:
+#   - /defaults/base@_here_
+
+scenarios: HH
+seeds: 0, 1, 2
+device: "cpu"
+score_based_algo: True
+# algo: Transformer
+algo: KNN 

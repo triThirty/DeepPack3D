@@ -1,5 +1,5 @@
 import numpy as np
-from split_gen import *
+from rl.split_gen import *
 
 
 class ItemGenerator:

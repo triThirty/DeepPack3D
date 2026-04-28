@@ -1,0 +1,14 @@
+defaults:
+  # - exp/MTGP
+  - exp/Transformer
+  - override hydra/launcher: joblib
+  - _self_
+
+hydra:
+  sweeper:
+    params:
+      exp.scenarios: ${exp.scenarios}
+      exp.seeds: ${exp.seeds}
+  verbose: Flase
+
+

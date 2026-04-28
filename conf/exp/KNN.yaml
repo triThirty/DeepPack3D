@@ -1,0 +1,7 @@
+device: "cpu"
+algo: KNN
+
+scenarios: HH
+seeds: 0
+
+n_neighbors: 3

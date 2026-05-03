@@ -56,13 +56,51 @@ def init_primitives(pset):
     pset.addPrimitive(np.minimum, 2)
 
     # terminals for sequencing and routing in my paper
-    pset.addTerminal(str("NIQ"))  # add by mengxu
-    pset.addTerminal(str("WIQ"))  # add by mengxu
-    pset.addTerminal(str("MWT"))  # add by mengxu
-    pset.addTerminal(str("PT"))  # add by mengxu
-    pset.addTerminal(str("NPT"))  # add by mengxu
-    pset.addTerminal(str("OWT"))  # add by mengxu
-    pset.addTerminal(str("WKR"))  # add by mengxu
-    pset.addTerminal(str("NOR"))  # add by mengxu
-    pset.addTerminal(str("TIS"))  # add by mengxu
-    pset.addTerminal(str("SLACK"))  # add by mengxu
+    pset.addTerminal(str("NOI"))  # number of items to be packed
+    pset.addTerminal(str("X"))  #  bin space coordinate x
+    pset.addTerminal(str("Y"))  # bin space coordinate y
+    pset.addTerminal(str("Z"))  # bin space coordinate z
+    pset.addTerminal(str("HMAP"))  # acurrent height map of the bin
+    pset.addTerminal(str("W"))  # the width of the item to be packed
+    pset.addTerminal(str("D"))  # the depth of the item to be packed
+    pset.addTerminal(str("H"))  # the height of the item to be packed
+    pset.addTerminal(str("COMPACTNESS"))  # the current compactness of the bin
+    # pset.addTerminal(str(""))  # add by mengxu
+
+
+def init_toolbox(toolbox, pset, config):
+    # pass
+    # REP.init_toolbox(toolbox, pset)
+    creator.create("Individual", list, fitness=creator.FitnessMin, pset=pset)
+    toolbox.register(
+        "expr", gp.genHalfAndHalf, pset=pset, min_=1, max_=6
+    )  # original max = 6, modified by mengxu 2022.10.15 to check
+    toolbox.register("tree", tools.initIterate, gp.PrimitiveTree, toolbox.expr)
+    N_TREES = 1  # todo: only for test, need to be the same with original GPFC.py
+    toolbox.register(
+        "individual", tools.initRepeat, creator.Individual, toolbox.tree, n=N_TREES
+    )
+    toolbox.register("population", tools.initRepeat, list, toolbox.individual)
+    toolbox.register("compile", gp.compile, pset=pset)
+
+    toolbox.register("expr_mut", gp.genFull, min_=2, max_=8)
+
+    toolbox.register("mate", tools.crossover.cxOnePoint)
+    toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut)
+
+    toolbox.register(
+        "select",
+        tools.selTournament,
+        tournsize=config.TOURNAMENT_SIZE,
+        elitism=config.ELITISM,
+    )
+
+
+def init_stats():
+    fitness_stats = tools.Statistics(lambda ind: ind.fitness.values)
+    stats = tools.MultiStatistics(fitness=fitness_stats)
+    stats.register("avg", np.mean)
+    stats.register("std", np.std)
+    stats.register("min", np.min)
+    stats.register("max", np.max)
+    return stats

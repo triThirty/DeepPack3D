@@ -113,6 +113,7 @@ heuristics = {
 
 
 def deeppack3d(
+    cfg,
     method,
     lookahead,
     *,
@@ -149,10 +150,9 @@ def deeppack3d(
     if train:
         print(f'Training with method "{method}" and lookahead {lookahead}...')
 
-        if method != "rl":
-            raise Exception('training mode can only be used if method is "rl"')
+        if method != "rl" and method != "gp":
+            raise Exception('training mode can only be used if method is "rl" or "gp".')
 
-        # env = BinPackerEnv(size=(32, 32, 32), k=env.k, bin_size=(32, 32, 32))
         agent = Agent(
             env,
             train=True,
@@ -162,11 +162,14 @@ def deeppack3d(
         )
 
         agent.eps = 1.0
-        for i in range(n_iterations):
-            print(f"Iteration {i}")
-            start_time = time.time()
-            yield from agent.run(100, verbose=verbose > 1)
-            agent.eps = max(agent.eps * 0.95, 0.025)
+        if method == "rl":
+            for i in range(n_iterations):
+                print(f"Iteration {i}")
+                start_time = time.time()
+                yield from agent.run(100, verbose=verbose > 1)
+                agent.eps = max(agent.eps * 0.95, 0.025)
+        elif method == "gp":
+            gp.main(cfg, agent)
 
         data = np.asarray([utils for utils, n_bins, ep_reward in agent.ep_history])
         # y = np.ones(100)
@@ -244,7 +247,7 @@ def deeppack3d(
 
 def merge_conf(cli_conf: DictConfig) -> DictConfig:
     base_conf = OmegaConf.load("conf/defaults/base.yaml")
-    algo_conf = OmegaConf.load(f"conf/exp/{cli_conf["--method"]}.yaml")
+    algo_conf = OmegaConf.load(f"conf/exp/{cli_conf['--method']}.yaml")
     conf = OmegaConf.merge(base_conf, algo_conf, cli_conf)
     return conf
 
@@ -252,24 +255,22 @@ def merge_conf(cli_conf: DictConfig) -> DictConfig:
 def main():
     args = parse_args()
     reset_rng(args.seed)
-    if args.method == "gp":
-        cli_conf = OmegaConf.from_cli()  # Default to KNN if not specified
-        cfg = merge_conf(cli_conf)
-        gp.main(cfg)
-    else:
-        for _ in deeppack3d(
-            args.method,
-            args.lookahead,
-            n_iterations=args.n_iterations,
-            seed=args.seed,
-            train=args.train,
-            verbose=args.verbose,
-            data=args.data,
-            path=args.path,
-            visualize=args.visualize,
-            batch_size=args.batch_size,
-        ):
-            pass
+    cli_conf = OmegaConf.from_cli()  # Default to KNN if not specified
+    cfg = merge_conf(cli_conf)
+    for _ in deeppack3d(
+        cfg,
+        args.method,
+        args.lookahead,
+        n_iterations=args.n_iterations,
+        seed=args.seed,
+        train=args.train,
+        verbose=args.verbose,
+        data=args.data,
+        path=args.path,
+        visualize=args.visualize,
+        batch_size=args.batch_size,
+    ):
+        pass
 
 
 if __name__ == "__main__":

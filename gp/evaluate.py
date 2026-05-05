@@ -16,6 +16,10 @@ def _evaluate_individual(agent, individual):
     # TODO: use gp to decide the action
     # action, r = self.select(state)
     # TODO: use gp to decide the action
+    # action_space = indices(actions)
+    for action in actions:
+        i, j, k = action
+        _, (x, y, z), (w, h, d), _ = actions[i][j][k]
 
     # next_state, reward, done = evaluated_agent.env.step(action)
 

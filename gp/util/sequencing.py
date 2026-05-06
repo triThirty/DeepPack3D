@@ -1,20 +1,20 @@
 import numpy as np
+from rl.agent import gp_actions_data
 
 
-def GP_evolve_S(data, tree_S):  # genetic programming evolved sequencing rule
-    new_data = []
-    # new_data.append(np.array([data[0] for i in range(len(data[3]))]))
-    # new_data.append(np.array([data[1] for i in range(len(data[3]))]))
-    # new_data.append(np.array([data[2] for i in range(len(data[3]))]))
-    # for i in range(3, len(data)):
-    #     new_data.append(data[i])
-    individualvalue = treeNode_S(
-        tree_S, 0, new_data
-    )  # todo: actually, this should be used for sequencing rule
-    if isinstance(individualvalue, (np.int64, np.float64, float, int)):
-        return 0  # todo: need to check if this is right!!! by mengxu 2022.10.15
-    job_position = individualvalue.argmin()
-    return job_position
+def GP_action_selector(
+    actions, individual
+):  # genetic programming evolved sequencing rule
+    actions_data = gp_actions_data(actions)
+
+    actions_values = []
+    for action_data in actions_data:
+        action_value = treeNode_S(individual, 0, action_data)
+        actions_values.append(action_value)
+    action_position = np.argmax(actions_values)
+    i, j, k = actions_data[action_position][-1]
+    # action = actions[i][j][k]
+    return (i, j, k)
 
 
 def treeNode_S(tree, index, data):
@@ -48,25 +48,36 @@ def treeNode_S(tree, index, data):
                     # print(ref[i])
                 return ref
     elif tree[index].arity == 0:
-        if tree[index].name == "NIQ":
+        if tree[index].name == "X":
             return data[0]
-        elif tree[index].name == "WIQ":
+        elif tree[index].name == "Y":
             return data[1]
-        elif tree[index].name == "MWT":
+        elif tree[index].name == "Z":
             return data[2]
-        elif tree[index].name == "PT":
+        elif tree[index].name == "W":
             return data[3]
-        elif tree[index].name == "NPT":
+        elif tree[index].name == "D":
             return data[4]
-        elif tree[index].name == "OWT":
+        elif tree[index].name == "H":
             return data[5]
-        elif tree[index].name == "WKR":
-            return data[6]
-        elif tree[index].name == "NOR":
-            return data[7]
-        elif tree[index].name == "TIS":
-            return data[8]
-        elif tree[index].name == "SLACK":
-            return data[9]
+        # elif tree[index].name == "WKR":
+        #     return data[6]
+        # elif tree[index].name == "NOR":
+        #     return data[7]
+        # elif tree[index].name == "TIS":
+        #     return data[8]
+        # elif tree[index].name == "SLACK":
+        #     return data[9]
 
         # return tree[index].value
+
+
+def protected_div(left, right):
+    with np.errstate(divide="ignore", invalid="ignore"):
+        x = np.divide(left, right)
+        if isinstance(x, np.ndarray):
+            x[np.isinf(x)] = 1
+            x[np.isnan(x)] = 1
+        elif np.isinf(x) or np.isnan(x):
+            x = 1
+    return x

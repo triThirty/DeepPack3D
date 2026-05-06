@@ -68,7 +68,7 @@ def parse_args():
     parser.add_argument(
         "--seed",
         metavar="",
-        type=str,
+        type=int,
         default=None,
         help='set the random seed for reproducibility, only used if --data is "generated" (default: None).',
     )
@@ -256,7 +256,10 @@ def main():
     args = parse_args()
     reset_rng(args.seed)
     cli_conf = OmegaConf.from_cli()  # Default to KNN if not specified
-    cfg = merge_conf(cli_conf)
+    if args.method == "gp":
+        cfg = merge_conf(cli_conf)
+    else:
+        cfg = cli_conf
     for _ in deeppack3d(
         cfg,
         args.method,

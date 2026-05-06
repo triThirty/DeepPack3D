@@ -1,40 +1,43 @@
+import itertools
 import copy
-import threading
-from concurrent.futures import ThreadPoolExecutor
-from .util.sequencing import treeNode_S, GP_evolve_S
+import numpy as np
 
-from rl.env import indices
+from concurrent.futures import ThreadPoolExecutor
+from .util.sequencing import GP_action_selector
+
+from rl.geometry import Cuboid
 
 
 def _evaluate_individual(agent, individual):
     evaluated_agent = copy.deepcopy(agent)
     state = evaluated_agent.env.reset()
 
-    items, h_map, actions = state
-    if len(actions) == 0:
-        raise Exception("0 actions")
-    # TODO: use gp to decide the action
-    # action, r = self.select(state)
-    # TODO: use gp to decide the action
-    # action_space = indices(actions)
-    for action in actions:
-        i, j, k = action
-        _, (x, y, z), (w, h, d), _ = actions[i][j][k]
+    for step in itertools.count():
+        items, h_map, actions = state
+        action = GP_action_selector(actions, individual[0])
+        next_state, _, done = evaluated_agent.env.step(action)
 
-    # next_state, reward, done = evaluated_agent.env.step(action)
+        if done:
+            break
+        for i, packer in enumerate(evaluated_agent.env.packers):
+            packer.render().savefig(f"./outputs/gp_{step}_{i}.jpg")
+        state = next_state
 
-    return 0
+    return round(evaluated_agent.env.used_packers[0].space_utilization() * 100, 2)
 
 
 def evaluate(population, agent):
     fitness_list = []
 
-    with ThreadPoolExecutor(max_workers=1) as executor:
-        futures = [
-            executor.submit(_evaluate_individual, agent, individual)
-            for individual in population
-        ]
+    # with ThreadPoolExecutor(max_workers=1) as executor:
+    # futures = [
+    #     executor.submit(_evaluate_individual, agent, individual)
+    #     for individual in population
+    # ]
 
-        fitness_list = [future.result() for future in futures]
+    # fitness_list = [future.result() for future in futures]
+    for individual in population:
+        fitness = _evaluate_individual(agent, individual)
+        fitness_list.append(fitness)
 
     return fitness_list

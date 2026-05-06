@@ -1,4 +1,5 @@
 import numpy as np
+import random
 
 from rl.geometry import *
 
@@ -11,6 +12,7 @@ rng = None
 def reset_rng(seed=None):
     global rng
     np.random.seed(seed=None)
+    random.seed(seed)
     rng = np.random.default_rng(seed=seed)
 
 

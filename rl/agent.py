@@ -489,6 +489,24 @@ class HeuristicAgent:
                 )
 
 
+def gp_actions_data(actions):
+    actions_data = []
+    for i, item in enumerate(actions):
+        for j, bin_ in enumerate(item):
+            for k, placement in enumerate(bin_):
+                action_data = []
+                item, (x, y, z), (w, h, d), _ = placement
+                action_data.append(x)
+                action_data.append(y)
+                action_data.append(z)
+                action_data.append(w)
+                action_data.append(d)
+                action_data.append(h)
+                action_data.append([i, j, k])
+                actions_data.append(action_data)
+    return actions_data
+
+
 def bottom_left(actions):
     scores = []
     for i, item in enumerate(actions):

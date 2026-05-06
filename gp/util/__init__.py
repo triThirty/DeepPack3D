@@ -56,15 +56,15 @@ def init_primitives(pset):
     pset.addPrimitive(np.minimum, 2)
 
     # terminals for sequencing and routing in my paper
-    pset.addTerminal(str("NOI"))  # number of items to be packed
+    # pset.addTerminal(str("NOI"))  # number of items to be packed
     pset.addTerminal(str("X"))  #  bin space coordinate x
     pset.addTerminal(str("Y"))  # bin space coordinate y
     pset.addTerminal(str("Z"))  # bin space coordinate z
-    pset.addTerminal(str("HMAP"))  # acurrent height map of the bin
+    # pset.addTerminal(str("HMAP"))  # acurrent height map of the bin
     pset.addTerminal(str("W"))  # the width of the item to be packed
     pset.addTerminal(str("D"))  # the depth of the item to be packed
     pset.addTerminal(str("H"))  # the height of the item to be packed
-    pset.addTerminal(str("COMPACTNESS"))  # the current compactness of the bin
+    # pset.addTerminal(str("COMPACTNESS"))  # the current compactness of the bin
     # pset.addTerminal(str(""))  # add by mengxu
 
 

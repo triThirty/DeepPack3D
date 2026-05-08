@@ -19,8 +19,8 @@ def _evaluate_individual(agent, individual):
 
         if done:
             break
-        for i, packer in enumerate(evaluated_agent.env.packers):
-            packer.render().savefig(f"./outputs/gp_{step}_{i}.jpg")
+        # for i, packer in enumerate(evaluated_agent.env.packers):
+        #     packer.render().savefig(f"./outputs/gp_{step}_{i}.jpg")
         state = next_state
 
     return round(evaluated_agent.env.used_packers[0].space_utilization() * 100, 2)

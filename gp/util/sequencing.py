@@ -13,7 +13,6 @@ def GP_action_selector(
         actions_values.append(action_value)
     action_position = np.argmax(actions_values)
     i, j, k = actions_data[action_position][-1]
-    # action = actions[i][j][k]
     return (i, j, k)
 
 

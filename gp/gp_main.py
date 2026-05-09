@@ -22,6 +22,7 @@ def GPFC_main(config, agent):
     stats = init_stats()
     hof = tools.HallOfFame(1)
 
+    print("Start training...")
     pop, logbook, max_fitness, best_ind_all_gen, _ = evolve(
         pop, agent, toolbox, stats, hof, config
     )

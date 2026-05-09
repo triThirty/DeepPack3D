@@ -1,4 +1,5 @@
 import random
+import gc
 
 from deap import tools
 
@@ -6,6 +7,7 @@ from .util import record
 
 
 def varAnd(population, toolbox, cxpb, mutpb, reppb):
+    """Create offspring from population with minimal memory duplication."""
     offspring = [toolbox.clone(ind) for ind in population]
     new_cxpb = cxpb / (cxpb + mutpb + reppb)
     new_mutpb = mutpb / (cxpb + mutpb + reppb) + new_cxpb
@@ -32,19 +34,19 @@ def varAnd(population, toolbox, cxpb, mutpb, reppb):
 
 
 def evolve(population, agent, toolbox, stats, hof, config):
+    """Evolve population with improved memory management."""
     logbook = tools.Logbook()
     logbook.header = ["gen", "nevals"] + (stats.fields if stats else [])
     max_fitness = []
     best_ind_all_gen = []
-    all_individuals = []
+
     # Begin the generational process
     for gen in range(1, config.NGEN + 1):
         # Step 3: Full Fitness Evaluation
-        # fitnesses = toolbox.multiProcess(
         fitnesses = toolbox.evaluate(population, agent)
         for ind, fit in zip(population, fitnesses):
             ind.fitness.values = (fit,)
-        # Step 3: Full Fitness Evaluation
+        del fitnesses  # Release memory
 
         record(
             hof,
@@ -61,17 +63,25 @@ def evolve(population, agent, toolbox, stats, hof, config):
         # Step 5-7: Produce Offspring from population in intermediate population
         parents = toolbox.select(population, len(population))  # Select parents
         elitism_pop = tools.selBest(population, config.ELITISM)  # Select elitism
+
+        # Generate exactly needed offspring (avoid over-allocation)
+        offspring_needed = len(population) - config.ELITISM
         pop_intermediate = []
-        while len(pop_intermediate) < len(population):
-            offspring_intermediate = varAnd(
-                parents, toolbox, config.CXPB, config.MUTPB, config.REPPB
+        while len(pop_intermediate) < offspring_needed:
+            batch_size = min(len(parents), offspring_needed - len(pop_intermediate))
+            parent_batch = parents[:batch_size]
+            offspring_batch = varAnd(
+                parent_batch, toolbox, config.CXPB, config.MUTPB, config.REPPB
             )
-            pop_intermediate.extend(offspring_intermediate)
-            del offspring_intermediate
-        pop_intermediate[:] = pop_intermediate[: len(population) - config.ELITISM]
-        # Step 5-7: Produce Offspring from population in intermediate population
+            pop_intermediate.extend(offspring_batch)
+            del offspring_batch  # Release memory immediately
 
         # Replace the current population by the offspring
-        population[:] = elitism_pop + pop_intermediate
+        population[:] = elitism_pop + pop_intermediate[:offspring_needed]
+        del parents, elitism_pop, pop_intermediate  # Release memory
 
-    return population, logbook, max_fitness, best_ind_all_gen, all_individuals
+        # Periodic garbage collection to reclaim memory
+        if gen % 2 == 0:
+            gc.collect()
+
+    return population, logbook, max_fitness, best_ind_all_gen, []

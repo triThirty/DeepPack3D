@@ -1,6 +1,6 @@
 # import simpy
 import time
-from deap import base, creator, gp, tools
+from deap import base, gp, tools
 import numpy as np
 
 from .util import init_primitives, init_stats, init_toolbox, saveFile
@@ -22,11 +22,11 @@ def GPFC_main(config, agent):
     stats = init_stats()
     hof = tools.HallOfFame(1)
 
-    pop, logbook, max_fitness, best_ind_all_gen, all_individuals = evolve(
+    pop, logbook, max_fitness, best_ind_all_gen, _ = evolve(
         pop, agent, toolbox, stats, hof, config
     )
     best = hof[0]
-    return max_fitness, best, best_ind_all_gen, all_individuals
+    return max_fitness, best, best_ind_all_gen, []
 
 
 def main(config, agent):

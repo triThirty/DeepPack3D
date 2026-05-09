@@ -249,6 +249,11 @@ def merge_conf(cli_conf: DictConfig) -> DictConfig:
     base_conf = OmegaConf.load("conf/defaults/base.yaml")
     algo_conf = OmegaConf.load(f"conf/exp/{cli_conf['--method']}.yaml")
     conf = OmegaConf.merge(base_conf, algo_conf, cli_conf)
+    conf.seed = cli_conf["--seed"]
+    conf.lookahead = cli_conf["--lookahead"]
+    conf.method = cli_conf["--method"]
+    conf.train = cli_conf["--train"]
+    conf.verbose = cli_conf["--verbose"]
     return conf
 
 

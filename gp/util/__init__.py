@@ -2,10 +2,9 @@ import copy
 import random
 import numpy as np
 
-from collections import defaultdict
-from deap import gp, creator
+from deap import gp, creator, base
 from deap import tools
-from functools import partial
+from . import saveFile 
 
 
 def protected_div(left, right):
@@ -17,33 +16,6 @@ def protected_div(left, right):
         elif np.isinf(x) or np.isnan(x):
             x = 1
     return x
-
-
-def init_toolbox(toolbox, pset):
-    creator.create(
-        "Individual",
-        list,
-        fitness=creator.FitnessMin,
-        num_calculation=int,
-        pset=pset,
-    )
-
-    toolbox.register(
-        "expr", gp.genHalfAndHalf, pset=pset, min_=1, max_=6
-    )  # original max = 6, modified by mengxu 2022.10.15 to check
-    toolbox.register("tree", tools.initIterate, gp.PrimitiveTree, toolbox.expr)
-    toolbox.register(
-        "individual", tools.initRepeat, creator.Individual, toolbox.tree, n=N_TREES
-    )
-    toolbox.register("population", tools.initRepeat, list, toolbox.individual)
-    toolbox.register("compile", gp.compile, pset=pset)
-    toolbox.register("expr_mut", gp.genFull, min_=2, max_=8)
-
-    toolbox.register("mate", lim_xmate)
-    toolbox.register("mutate", lim_xmut, expr=toolbox.expr_mut)
-
-    toolbox.register("score_mate", newlim_xmate)
-    toolbox.register("score_mutate", newlim_xmut, expr=toolbox.expr_mut)
 
 
 def init_primitives(pset):
@@ -69,14 +41,17 @@ def init_primitives(pset):
 
 
 def init_toolbox(toolbox, pset, config):
-    # pass
-    # REP.init_toolbox(toolbox, pset)
-    creator.create("Individual", list, fitness=creator.FitnessMin, pset=pset)
+    weights = (1.0,)
+    creator.create("FitnessMax", base.Fitness, weights=weights)
+    creator.create("Individual", list, fitness=creator.FitnessMax, pset=pset)
+
     toolbox.register(
         "expr", gp.genHalfAndHalf, pset=pset, min_=1, max_=6
     )  # original max = 6, modified by mengxu 2022.10.15 to check
     toolbox.register("tree", tools.initIterate, gp.PrimitiveTree, toolbox.expr)
-    N_TREES = 1  # todo: only for test, need to be the same with original GPFC.py
+    N_TREES = (
+        config.N_TREES
+    )  # todo: only for test, need to be the same with original GPFC.py
     toolbox.register(
         "individual", tools.initRepeat, creator.Individual, toolbox.tree, n=N_TREES
     )
@@ -85,15 +60,50 @@ def init_toolbox(toolbox, pset, config):
 
     toolbox.register("expr_mut", gp.genFull, min_=2, max_=8)
 
-    toolbox.register("mate", tools.crossover.cxOnePoint)
-    toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut)
+    toolbox.register("mate", lim_xmate)
+    toolbox.register("mutate", lim_xmut, expr=toolbox.expr_mut)
+    toolbox.register("select", tools.selTournament, tournsize=config.TOURNAMENT_SIZE)
 
-    toolbox.register(
-        "select",
-        tools.selTournament,
-        tournsize=config.TOURNAMENT_SIZE,
-        elitism=config.ELITISM,
-    )
+
+# the following is modified by mengxu
+def xmate(ind1, ind2):
+    i1 = random.randrange(len(ind1))
+    ind1[i1], ind2[i1] = gp.cxOnePoint(ind1[i1], ind2[i1])
+
+    # exchange the other tree
+    # i2 = 1 - i1  # only for individual with two tree
+    # ind1[i2], ind2[i2] = ind2[i2], ind1[i2]
+    return ind1, ind2
+
+
+def maxheight(v):
+    return max(i.height for i in v)
+
+
+def wrap(func, *args, **kwargs):
+    # MAX_HEIGHT = 8 #todo: only for test, need to be the same with original GPFC.py
+    keep_inds = [copy.deepcopy(ind) for ind in args]
+    new_inds = list(func(*args, **kwargs))
+    for i, ind in enumerate(new_inds):
+        if maxheight(ind) > 8:
+            new_inds[i] = random.choice(keep_inds)
+    return new_inds
+
+
+def lim_xmate(ind1, ind2):
+    return wrap(xmate, ind1, ind2)
+
+
+def xmut(ind, expr):
+    i1 = random.randrange(len(ind))
+    indx = gp.mutUniform(ind[i1], expr, pset=ind.pset)
+    ind[i1] = indx[0]
+    return (ind,)
+
+
+def lim_xmut(ind, expr):
+    res = wrap(xmut, ind, expr=expr)
+    return res
 
 
 def init_stats():
@@ -104,3 +114,32 @@ def init_stats():
     stats.register("min", np.min)
     stats.register("max", np.max)
     return stats
+
+
+def record(
+    halloffame,
+    population,
+    gen,
+    stats,
+    logbook,
+    verbose,
+    config,
+    min_fitness,
+    best_ind_all_gen,
+):
+    if halloffame is not None:
+        halloffame.clear()
+        halloffame.update(population)
+
+    pop_fit = [ind.fitness.values[0] for ind in population]
+    best_index = np.argmin(pop_fit)
+    best_ind_all_gen.append(population[best_index])
+    p_one = population[best_index]
+    saveFile.save_individual_each_gen_to_txt(config, p_one, gen)
+
+    record = stats.compile(population) if stats else {}
+    logbook.record(gen=gen, nevals=len(population), **record)
+    if verbose:
+        print(logbook.stream)
+
+    min_fitness.append(p_one.fitness.values[0])

@@ -7,7 +7,7 @@ MUTPB: 0.15
 REPPB: 0.05
 ELITISM: 10
 MAX_HEIGHT: 8
-N_TREES: 2
+N_TREES: 1
 TOURNAMENT_SIZE: 4
 
 # create the shop floor instance

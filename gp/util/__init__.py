@@ -1,10 +1,12 @@
 import copy
 import random
-import numpy as np
+import json
 
+import numpy as np
 from deap import gp, creator, base
 from deap import tools
-from . import saveFile 
+
+from . import saveFile
 
 
 def protected_div(left, right):
@@ -143,3 +145,14 @@ def record(
         print(logbook.stream)
 
     min_fitness.append(p_one.fitness.values[0])
+
+
+def load_individual_from_gen_json_format(config):
+    path = saveFile.formula_base_dir.substitute(**config)
+    with open(
+        path,
+        "r",
+    ) as fileName_individual:
+        dict = json.load(fileName_individual)
+
+    return dict

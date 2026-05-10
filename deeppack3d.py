@@ -7,6 +7,7 @@ import time
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from omegaconf import DictConfig, OmegaConf
+from deap import gp as deap_gp
 
 from rl.env import MultiBinPackerEnv
 from rl.conveyor import FileConveyor, InputConveyor
@@ -21,6 +22,7 @@ from rl.agent import (
 from rl.split_gen import reset_rng
 
 from gp import gp_main as gp
+from gp.util import saveFile, load_individual_from_gen_json_format
 
 
 def parse_args():
@@ -205,6 +207,53 @@ def deeppack3d(
             )
             agent.q_net = tf.keras.models.load_model(model_path, compile=False)
             agent.eps = 0.0
+        elif method == "gp":
+            # dict_best_MTGP_individuals = load_individual_from_gen(cfg)
+            dict_best_MTGP_individuals_dict = load_individual_from_gen_json_format(cfg)
+
+            testSeeds = 123453
+            np.random.seed(int(testSeeds))
+
+            pset = deap_gp.PrimitiveSet("MAIN", 0, prefix="f")
+            pset.context["array"] = np.array
+            from gp.util import init_primitives
+
+            init_primitives(pset)
+
+            agent = Agent(
+                env,
+                train=False,
+                verbose=verbose > 0,
+                visualize=visualize,
+                batch_size=batch_size,
+            )
+            for run in range(cfg.evaluation_iterations):
+                seed = np.random.randint(2000000000)
+                print(
+                    "******************* ITERATION-{} on SEED-{} *******************".format(
+                        run, seed
+                    )
+                )
+
+                for idx, individual in enumerate(dict_best_MTGP_individuals_dict):
+                    rule_string = individual.get("T0")
+                    rule = deap_gp.PrimitiveTree.from_string(rule_string, pset=pset)
+                    from gp.evaluate import _evaluate_individual
+
+                    fitness_value = _evaluate_individual(
+                        agent,
+                        [
+                            rule,
+                        ],
+                    )
+                    individual["fitness"] += fitness_value
+
+            for ind in dict_best_MTGP_individuals_dict:
+                ind["fitness"] = ind["fitness"] / cfg.evaluation_iterations
+            saveFile.save_each_gen_best_individual_on_test_dataset(
+                cfg, dict_best_MTGP_individuals_dict
+            )
+
         else:
             agent = HeuristicAgent(
                 heuristics[method], env, verbose=verbose > 0, visualize=visualize
@@ -249,11 +298,11 @@ def merge_conf(cli_conf: DictConfig) -> DictConfig:
     base_conf = OmegaConf.load("conf/defaults/base.yaml")
     algo_conf = OmegaConf.load(f"conf/exp/{cli_conf['--method']}.yaml")
     conf = OmegaConf.merge(base_conf, algo_conf, cli_conf)
-    conf.seed = cli_conf["--seed"]
-    conf.lookahead = cli_conf["--lookahead"]
-    conf.method = cli_conf["--method"]
-    conf.train = cli_conf["--train"]
-    conf.verbose = cli_conf["--verbose"]
+    conf.seed = cli_conf.get("--seed", None)
+    conf.lookahead = cli_conf.get("--lookahead", None)
+    conf.method = cli_conf.get("--method", None)
+    conf.train = cli_conf.get("--train", None)
+    conf.verbose = cli_conf.get("--verbose", None)
     return conf
 
 

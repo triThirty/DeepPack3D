@@ -14,7 +14,7 @@ def GPFC_main(config, agent):
     pset.context["array"] = np.array
     init_primitives(pset)
 
-    toolbox = base.Toolbox()  # base.Toolbox()
+    toolbox = base.Toolbox()
     init_toolbox(toolbox, pset, config)
     toolbox.register("evaluate", evaluate)
 

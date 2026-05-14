@@ -47,7 +47,7 @@ def evolve(population, agent, toolbox, stats, hof, config):
         start_time = time.time()
         print("----------------------------------")
         print(f"Evaluating generation {gen}...")
-        fitnesses = toolbox.evaluate(population, agent)
+        fitnesses = toolbox.evaluate(population, agent, gen, config)
         print(f"Evaluation completed in {time.time() - start_time:.2f} seconds.")
         for ind, fit in zip(population, fitnesses):
             ind.fitness.values = (fit,)

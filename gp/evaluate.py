@@ -1,7 +1,10 @@
 from .util.sequencing import GP_action_selector
 
+from rl.split_gen import reset_rng
 
-def _evaluate_once(agent, individual):
+
+def _evaluate_once(agent, individual, gen, config):
+    reset_rng(seed=config.seed * gen * 27)
     state = agent.env.reset()
 
     step = 0
@@ -21,15 +24,20 @@ def _evaluate_once(agent, individual):
     return agent.env.used_packers[0].space_utilization() * 100
 
 
-def _evaluate_individual(agent, individual, n_runs=10):
+def _evaluate_individual(agent, individual, gen, config, n_runs=1):
     total_fitness = 0.0
 
     for _ in range(n_runs):
-        total_fitness += _evaluate_once(agent, individual)
+        total_fitness += _evaluate_once(agent, individual, gen, config)
 
     return round(total_fitness / n_runs, 2)
 
 
-def evaluate(population, agent):
-    """Evaluate population sequentially with minimal memory overhead."""
-    return [_evaluate_individual(agent, individual) for individual in population]
+def evaluate(population, agent, gen, config):
+
+    fitness_list = []
+    for individual in population:
+        fitness = _evaluate_individual(agent, individual, gen, config)
+        fitness_list.append(fitness)
+
+    return fitness_list

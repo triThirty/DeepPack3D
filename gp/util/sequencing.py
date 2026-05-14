@@ -55,10 +55,22 @@ def treeNode_S(tree, index, data):
             return data[2]
         elif tree[index].name == "W":
             return data[3]
-        elif tree[index].name == "D":
-            return data[4]
         elif tree[index].name == "H":
+            return data[4]
+        elif tree[index].name == "D":
             return data[5]
+        elif tree[index].name == "S_X":
+            return data[6]
+        elif tree[index].name == "S_Y":
+            return data[7]
+        elif tree[index].name == "S_Z":
+            return data[8]
+        elif tree[index].name == "S_W":
+            return data[9]
+        elif tree[index].name == "S_H":
+            return data[10]
+        elif tree[index].name == "S_D":
+            return data[11]
         # elif tree[index].name == "WKR":
         #     return data[6]
         # elif tree[index].name == "NOR":

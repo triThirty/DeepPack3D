@@ -495,13 +495,19 @@ def gp_actions_data(actions):
         for j, bin_ in enumerate(item):
             for k, placement in enumerate(bin_):
                 action_data = []
-                item, (x, y, z), (w, h, d), _ = placement
+                item, (x, y, z), (w, h, d), (s_x, s_y, s_z, s_w, s_h, s_d) = placement
                 action_data.append(x)
                 action_data.append(y)
                 action_data.append(z)
                 action_data.append(w)
-                action_data.append(d)
                 action_data.append(h)
+                action_data.append(d)
+                action_data.append(s_x)
+                action_data.append(s_y)
+                action_data.append(s_z)
+                action_data.append(s_w)
+                action_data.append(s_h)
+                action_data.append(s_d)
                 action_data.append([i, j, k])
                 actions_data.append(action_data)
     return actions_data

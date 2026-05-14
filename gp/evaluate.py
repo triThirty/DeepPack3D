@@ -4,10 +4,15 @@ from .util.sequencing import GP_action_selector
 def _evaluate_once(agent, individual):
     state = agent.env.reset()
 
+    step = 0
     while True:
         items, h_map, actions = state
+        # print(f"the available cuboid space: {len(actions[0][0])}")
         action = GP_action_selector(actions, individual[0])
         next_state, _, done = agent.env.step(action)
+        # for i, packer in enumerate(agent.env.packers):
+        #     packer.render().savefig(f"./outputs/{step}_{i}.jpg")
+        step += 1
 
         if done:
             break

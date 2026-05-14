@@ -187,11 +187,12 @@ def deeppack3d(
         plt.savefig("./ep_reward.jpg")
         plt.show()
 
-        import uuid
+        if method == "rl":
+            import uuid
 
-        uid = uuid.uuid4()
-        print(f"saved model at ./{uid}.keras")
-        agent.q_net.save(f"{uid}.keras")
+            uid = uuid.uuid4()
+            print(f"saved model at ./{uid}.keras")
+            agent.q_net.save(f"{uid}.keras")
     else:
         if verbose > 0:
             print(f'Testing with method "{method}" and lookahead {lookahead}...')

@@ -29,17 +29,30 @@ def init_primitives(pset):
     pset.addPrimitive(np.maximum, 2)
     pset.addPrimitive(np.minimum, 2)
 
-    # terminals for sequencing and routing in my paper
-    # pset.addTerminal(str("NOI"))  # number of items to be packed
     pset.addTerminal(str("X"))  #  bin space coordinate x
     pset.addTerminal(str("Y"))  # bin space coordinate y
     pset.addTerminal(str("Z"))  # bin space coordinate z
-    # pset.addTerminal(str("HMAP"))  # acurrent height map of the bin
     pset.addTerminal(str("W"))  # the width of the item to be packed
     pset.addTerminal(str("D"))  # the depth of the item to be packed
     pset.addTerminal(str("H"))  # the height of the item to be packed
-    # pset.addTerminal(str("COMPACTNESS"))  # the current compactness of the bin
-    # pset.addTerminal(str(""))  # add by mengxu
+    pset.addTerminal(
+        str("S_X")
+    )  # the split position along x-axis of the item to be packed
+    pset.addTerminal(
+        str("S_Y")
+    )  # the split position along y-axis of the item to be packed
+    pset.addTerminal(
+        str("S_Z")
+    )  # the split position along z-axis of the item to be packed
+    pset.addTerminal(
+        str("S_W")
+    )  # the split position along width of the item to be packed
+    pset.addTerminal(
+        str("S_D")
+    )  # the split position along depth of the item to be packed
+    pset.addTerminal(
+        str("S_H")
+    )  # the split position along height of the item to be packed
 
 
 def init_toolbox(toolbox, pset, config):

@@ -246,6 +246,8 @@ def deeppack3d(
                         [
                             rule,
                         ],
+                        gen=123453,
+                        config=cfg,
                     )
                     individual["fitness"] += fitness_value
 

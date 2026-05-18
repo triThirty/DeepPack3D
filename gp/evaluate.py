@@ -10,7 +10,6 @@ def _evaluate_once(agent, individual, gen, config):
     step = 0
     while True:
         items, h_map, actions = state
-        # print(f"the available cuboid space: {len(actions[0][0])}")
         action = GP_action_selector(actions, individual[0])
         next_state, _, done = agent.env.step(action)
         # for i, packer in enumerate(agent.env.packers):

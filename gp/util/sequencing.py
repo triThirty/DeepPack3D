@@ -48,39 +48,29 @@ def treeNode_S(tree, index, data):
                 return ref
     elif tree[index].arity == 0:
         if tree[index].name == "X":
-            return data[0]
+            return np.float64(data[0])
         elif tree[index].name == "Y":
-            return data[1]
+            return np.float64(data[1])
         elif tree[index].name == "Z":
-            return data[2]
+            return np.float64(data[2])
         elif tree[index].name == "W":
-            return data[3]
+            return np.float64(data[3])
         elif tree[index].name == "H":
-            return data[4]
+            return np.float64(data[4])
         elif tree[index].name == "D":
-            return data[5]
+            return np.float64(data[5])
         elif tree[index].name == "S_X":
-            return data[6]
+            return np.float64(data[6])
         elif tree[index].name == "S_Y":
-            return data[7]
+            return np.float64(data[7])
         elif tree[index].name == "S_Z":
-            return data[8]
+            return np.float64(data[8])
         elif tree[index].name == "S_W":
-            return data[9]
+            return np.float64(data[9])
         elif tree[index].name == "S_H":
-            return data[10]
+            return np.float64(data[10])
         elif tree[index].name == "S_D":
-            return data[11]
-        # elif tree[index].name == "WKR":
-        #     return data[6]
-        # elif tree[index].name == "NOR":
-        #     return data[7]
-        # elif tree[index].name == "TIS":
-        #     return data[8]
-        # elif tree[index].name == "SLACK":
-        #     return data[9]
-
-        # return tree[index].value
+            return np.float64(data[11])
 
 
 def protected_div(left, right):

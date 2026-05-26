@@ -296,7 +296,7 @@ class Agent:
             zip(grad, self.q_net_target.trainable_variables)
         )
 
-        self.q_optimizer.lr.assign(self.lr_scheduler(self.epoch))
+        self.q_optimizer.learning_rate.assign(self.lr_scheduler(self.epoch))
 
         self.epoch += 1
 
@@ -339,6 +339,7 @@ class Agent:
                 items, h_map, actions = state
                 if len(actions) == 0:
                     raise Exception("0 actions")
+                    # break
                 action, r = self.select(state)
 
                 if verbose:
@@ -387,7 +388,7 @@ class Agent:
             ]
             if self.verbose:
                 print(
-                    f"Episode {ep}, util: {utils}, used bins: {self.env.used_bins}, ep_reward: {ep_reward:.2f}, memory: {len(self.memory) if self.memory is not None else None}, eps: {self.eps:.2f}, loss: {loss}, lr: {self.q_optimizer.lr.numpy() if self.q_optimizer is not None else None}"
+                    f"Episode {ep}, util: {utils}, used bins: {self.env.used_bins}, ep_reward: {ep_reward:.2f}, memory: {len(self.memory) if self.memory is not None else None}, eps: {self.eps:.2f}, loss: {loss}, lr: {self.q_optimizer.learning_rate.numpy() if self.q_optimizer is not None else None}"
                 )
 
 

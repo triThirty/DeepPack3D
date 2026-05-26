@@ -7,20 +7,23 @@ def _evaluate_once(agent, individual, gen, config):
     reset_rng(seed=config.seed * gen * 27)
     state = agent.env.reset()
 
-    step = 0
+    # step = 0
+    return_v = 0
     while True:
         items, h_map, actions = state
         action = GP_action_selector(actions, individual[0])
-        next_state, _, done = agent.env.step(action)
+        next_state, reward, done = agent.env.step(action)
+        return_v += reward
         # for i, packer in enumerate(agent.env.packers):
         #     packer.render().savefig(f"./outputs/{step}_{i}.jpg")
-        step += 1
+        # step += 1
 
         if done:
             break
         state = next_state
 
-    return agent.env.used_packers[0].space_utilization() * 100
+    # return agent.env.used_packers[0].space_utilization() * 100
+    return return_v
 
 
 def _evaluate_individual(agent, individual, gen, config, n_runs=1):
@@ -29,7 +32,7 @@ def _evaluate_individual(agent, individual, gen, config, n_runs=1):
     for _ in range(n_runs):
         total_fitness += _evaluate_once(agent, individual, gen, config)
 
-    return round(total_fitness / n_runs, 2)
+    return round(total_fitness / n_runs, 4)
 
 
 def evaluate(population, agent, gen, config):

@@ -1,11 +1,16 @@
 import numpy as np
 from rl.agent import gp_actions_data
 
+from tensorflow.keras.layers import concatenate
 
 def GP_action_selector(
     actions, individual
 ):  # genetic programming evolved sequencing rule
-    actions_data = gp_actions_data(actions)
+    const_in, hmap_in, amap_in, imap_in = actions
+    actions_data = [
+        [a.squeeze(-1), b.squeeze(-1), c.squeeze(-1), d] 
+        for a, b, c, d in zip(const_in, hmap_in, amap_in, imap_in)
+    ]
 
     actions_values = []
     for action_data in actions_data:
@@ -16,23 +21,37 @@ def GP_action_selector(
     return (i, j, k)
 
 
+# def GP_action_selector(
+#     actions, individual
+# ):  # genetic programming evolved sequencing rule
+#     actions_data = gp_actions_data(actions)
+
+#     actions_values = []
+#     for action_data in actions_data:
+#         action_value = treeNode_S(individual, 0, action_data)
+#         actions_values.append(action_value)
+#     action_position = np.argmax(actions_values)
+#     i, j, k = actions_data[action_position][-1]
+#     return (i, j, k)
+
+
 def treeNode_S(tree, index, data):
     if tree[index].arity == 2:
-        if tree[index].name == "add":
+        if tree[index].name == "ScalarAdd":
             return treeNode_S(tree, index + 1, data) + treeNode_S(tree, index + 2, data)
-        elif tree[index].name == "subtract":
+        elif tree[index].name == "ScalarSub":
             return treeNode_S(tree, index + 1, data) - treeNode_S(tree, index + 2, data)
-        elif tree[index].name == "multiply":
+        elif tree[index].name == "ScalarMul":
             return treeNode_S(tree, index + 1, data) * treeNode_S(tree, index + 2, data)
-        elif tree[index].name == "protected_div":
+        elif tree[index].name == "ScalarDiv":
             return protected_div(
                 treeNode_S(tree, index + 1, data), treeNode_S(tree, index + 2, data)
             )
-        elif tree[index].name == "maximum":
+        elif tree[index].name == "ScalarMax":
             return np.maximum(
                 treeNode_S(tree, index + 1, data), treeNode_S(tree, index + 2, data)
             )
-        elif tree[index].name == "minimum":
+        elif tree[index].name == "ScalarMin":
             return np.minimum(
                 treeNode_S(tree, index + 1, data), treeNode_S(tree, index + 2, data)
             )

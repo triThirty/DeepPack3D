@@ -21,38 +21,36 @@ def protected_div(left, right):
 
 
 def init_primitives(pset):
-    # add function
-    pset.addPrimitive(np.add, 2)
-    pset.addPrimitive(np.subtract, 2)
-    pset.addPrimitive(np.multiply, 2)
-    pset.addPrimitive(protected_div, 2)
-    pset.addPrimitive(np.maximum, 2)
-    pset.addPrimitive(np.minimum, 2)
+    # --- Matrix-to-Matrix Primitives ---
+    # These let the tree process, blend, or compare the image inputs first
+    pset.addPrimitive(np.add, [np.ndarray, np.ndarray], np.ndarray, name="MatAdd")
+    pset.addPrimitive(np.subtract, [np.ndarray, np.ndarray], np.ndarray, name="MatSub")
+    pset.addPrimitive(np.absolute, [np.ndarray], np.ndarray, name="MatAbs")
 
-    pset.addTerminal(str("X"))  #  bin space coordinate x
-    pset.addTerminal(str("Y"))  # bin space coordinate y
-    pset.addTerminal(str("Z"))  # bin space coordinate z
-    pset.addTerminal(str("W"))  # the width of the item to be packed
-    pset.addTerminal(str("D"))  # the depth of the item to be packed
-    pset.addTerminal(str("H"))  # the height of the item to be packed
-    pset.addTerminal(
-        str("S_X")
-    )  # the split position along x-axis of the item to be packed
-    pset.addTerminal(
-        str("S_Y")
-    )  # the split position along y-axis of the item to be packed
-    pset.addTerminal(
-        str("S_Z")
-    )  # the split position along z-axis of the item to be packed
-    pset.addTerminal(
-        str("S_W")
-    )  # the split position along width of the item to be packed
-    pset.addTerminal(
-        str("S_D")
-    )  # the split position along depth of the item to be packed
-    pset.addTerminal(
-        str("S_H")
-    )  # the split position along height of the item to be packed
+    # --- Matrix-to-Scalar Bridge Primitives ---
+    # These collapse a 2D image matrix down into a single float constant
+    pset.addPrimitive(np.mean, [np.ndarray], float, name="MatMean")
+    pset.addPrimitive(np.std, [np.ndarray], float, name="MatStd")
+    pset.addPrimitive(lambda img: float(np.max(img)), [np.ndarray], float, name="MatMax")
+
+    # --- Scalar-to-Scalar Primitives ---
+    # Once converted to a float, the tree can perform standard scalar math
+    pset.addPrimitive(np.add, [float, float], float, name="ScalarAdd")
+    pset.addPrimitive(np.subtract, [float, float], float, name="ScalarSub")
+    pset.addPrimitive(np.multiply, [float, float], float, name="ScalarMul")
+    pset.addPrimitive(protected_div, [float, float], float, name="ScalarDiv")
+    pset.addPrimitive(np.maximum, [float, float], float, name="ScalarMax")
+    pset.addPrimitive(np.minimum, [float, float], float, name="ScalarMin")
+
+    # --- Constant Terminals ---
+    # Add random floating-point constants directly into the tree mix
+    pset.addEphemeralConstant("rand101", lambda: random.uniform(-1.0, 1.0), float)
+
+    pset.addTerminal("constance", np.ndarray, "Constant")  #  bin space coordinate x
+    pset.addTerminal("hmap", np.ndarray, "Height_Map")  # bin space coordinate y
+    pset.addTerminal("amap", np.ndarray, "Action_Map")  # bin space coordinate z
+    pset.addTerminal("imap", np.ndarray, "Item_Map")  # the width of the item to be packed
+
 
 
 def init_toolbox(toolbox, pset, config):

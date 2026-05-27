@@ -10,7 +10,12 @@ from .evolution import evolve
 
 def GPFC_main(config, agent):
     num_features = 0
-    pset = gp.PrimitiveSet("MAIN", num_features, prefix="f")
+    # pset = gp.PrimitiveSet("MAIN", num_features, prefix="f")
+    pset = gp.PrimitiveSetTyped("MAIN", [np.ndarray, np.ndarray, np.ndarray, np.ndarray], float, prefix="f")
+    pset.renameArguments(ARG0="Constant")   # Will map to your "constance" terminal
+    pset.renameArguments(ARG1="Height_Map") # Will map to your "hmap" terminal
+    pset.renameArguments(ARG2="Action_Map") # Will map to your "amap" terminal
+    pset.renameArguments(ARG3="Item_Map")   # Will map to your "imap" terminal
     pset.context["array"] = np.array
     init_primitives(pset)
 

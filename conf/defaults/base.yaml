@@ -1,6 +1,6 @@
 num_pre_selection: 3
 
-POP_SIZE: 1000
+POP_SIZE: 10
 NGEN: 200
 CXPB: 0.8
 MUTPB: 0.15

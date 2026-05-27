@@ -11,7 +11,9 @@ def _evaluate_once(agent, individual, gen, config):
     return_v = 0
     while True:
         items, h_map, actions = state
-        action = GP_action_selector(actions, individual[0])
+        [const_in, hmap_in, amap_in, imap_in] = agent.Q_inputs(state)
+
+        action = GP_action_selector([const_in, hmap_in, amap_in, imap_in], individual[0])
         next_state, reward, done = agent.env.step(action)
         return_v += reward
         # for i, packer in enumerate(agent.env.packers):

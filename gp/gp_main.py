@@ -11,17 +11,17 @@ from .evolution import evolve
 def GPFC_main(config, agent):
     num_features = 0
     # pset = gp.PrimitiveSet("MAIN", num_features, prefix="f")
-    pset = gp.PrimitiveSetTyped("MAIN", [np.ndarray, np.ndarray, np.ndarray, np.ndarray], float, prefix="f")
-    pset.renameArguments(ARG0="Constant")   # Will map to your "constance" terminal
-    pset.renameArguments(ARG1="Height_Map") # Will map to your "hmap" terminal
-    pset.renameArguments(ARG2="Action_Map") # Will map to your "amap" terminal
-    pset.renameArguments(ARG3="Item_Map")   # Will map to your "imap" terminal
+    pset = gp.PrimitiveSetTyped(
+        "MAIN", [np.ndarray, np.ndarray, np.ndarray, np.ndarray], float, prefix="f"
+    )
+    pset.renameArguments(f0="Constant", f1="Height_Map", f2="Action_Map", f3="Item_Map")
     pset.context["array"] = np.array
     init_primitives(pset)
 
     toolbox = base.Toolbox()
     init_toolbox(toolbox, pset, config)
     toolbox.register("evaluate", evaluate)
+    toolbox.register("compile", gp.compile, pset=pset)
 
     pop = toolbox.population(n=config.POP_SIZE)
     stats = init_stats()

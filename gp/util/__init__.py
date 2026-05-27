@@ -31,7 +31,9 @@ def init_primitives(pset):
     # These collapse a 2D image matrix down into a single float constant
     pset.addPrimitive(np.mean, [np.ndarray], float, name="MatMean")
     pset.addPrimitive(np.std, [np.ndarray], float, name="MatStd")
-    pset.addPrimitive(lambda img: float(np.max(img)), [np.ndarray], float, name="MatMax")
+    pset.addPrimitive(
+        lambda img: float(np.max(img)), [np.ndarray], float, name="MatMax"
+    )
 
     # --- Scalar-to-Scalar Primitives ---
     # Once converted to a float, the tree can perform standard scalar math
@@ -49,8 +51,9 @@ def init_primitives(pset):
     pset.addTerminal("constance", np.ndarray, "Constant")  #  bin space coordinate x
     pset.addTerminal("hmap", np.ndarray, "Height_Map")  # bin space coordinate y
     pset.addTerminal("amap", np.ndarray, "Action_Map")  # bin space coordinate z
-    pset.addTerminal("imap", np.ndarray, "Item_Map")  # the width of the item to be packed
-
+    pset.addTerminal(
+        "imap", np.ndarray, "Item_Map"
+    )  # the width of the item to be packed
 
 
 def init_toolbox(toolbox, pset, config):

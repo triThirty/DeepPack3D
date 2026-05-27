@@ -3,7 +3,7 @@ from .util.sequencing import GP_action_selector
 from rl.split_gen import reset_rng
 
 
-def _evaluate_once(agent, individual, gen, config):
+def _evaluate_once(agent, individual, gen, config, toolbox):
     reset_rng(seed=config.seed * gen * 27)
     state = agent.env.reset()
 
@@ -13,7 +13,9 @@ def _evaluate_once(agent, individual, gen, config):
         items, h_map, actions = state
         [const_in, hmap_in, amap_in, imap_in] = agent.Q_inputs(state)
 
-        action = GP_action_selector([const_in, hmap_in, amap_in, imap_in], individual[0])
+        action = GP_action_selector(
+            [const_in, hmap_in, amap_in, imap_in], individual[0], toolbox
+        )
         next_state, reward, done = agent.env.step(action)
         return_v += reward
         # for i, packer in enumerate(agent.env.packers):
@@ -28,20 +30,20 @@ def _evaluate_once(agent, individual, gen, config):
     return return_v
 
 
-def _evaluate_individual(agent, individual, gen, config, n_runs=1):
+def _evaluate_individual(agent, individual, gen, config, toolbox, n_runs=1):
     total_fitness = 0.0
 
     for _ in range(n_runs):
-        total_fitness += _evaluate_once(agent, individual, gen, config)
+        total_fitness += _evaluate_once(agent, individual, gen, config, toolbox)
 
     return round(total_fitness / n_runs, 4)
 
 
-def evaluate(population, agent, gen, config):
+def evaluate(population, agent, gen, config, toolbo):
 
     fitness_list = []
     for individual in population:
-        fitness = _evaluate_individual(agent, individual, gen, config)
+        fitness = _evaluate_individual(agent, individual, gen, config, toolbo)
         fitness_list.append(fitness)
 
     return fitness_list

@@ -48,12 +48,10 @@ def init_primitives(pset):
     # Add random floating-point constants directly into the tree mix
     pset.addEphemeralConstant("rand101", lambda: random.uniform(-1.0, 1.0), float)
 
-    pset.addTerminal("constance", np.ndarray, "Constant")  #  bin space coordinate x
-    pset.addTerminal("hmap", np.ndarray, "Height_Map")  # bin space coordinate y
-    pset.addTerminal("amap", np.ndarray, "Action_Map")  # bin space coordinate z
-    pset.addTerminal(
-        "imap", np.float64, "Item_Map"
-    )  # the width of the item to be packed
+    pset.addTerminal("constance", np.ndarray, "Constant")
+    pset.addTerminal("hmap", np.ndarray, "Height_Map")
+    pset.addTerminal("amap", np.ndarray, "Action_Map")
+    pset.addTerminal("imap", float, "Item_Map")
 
 
 def init_toolbox(toolbox, pset, config):

@@ -11,15 +11,16 @@ def _evaluate_once(agent, individual, gen, config, toolbox):
     return_v = 0
     while True:
         items, h_map, actions = state
-        [const_in, hmap_in, amap_in, imap_in] = agent.Q_inputs(state)
+        state_map = agent.Q_inputs(state)
 
         action = GP_action_selector(
-            [const_in, hmap_in, amap_in, imap_in], individual[0], toolbox
+            state_map, actions, individual[0], toolbox
         )
         next_state, reward, done = agent.env.step(action)
         return_v += reward
         # for i, packer in enumerate(agent.env.packers):
         #     packer.render().savefig(f"./outputs/{step}_{i}.jpg")
+        # print(f"gen: {gen}, step: {step}, action: {action}, reward: {reward}, return: {return_v}")
         # step += 1
 
         if done:
@@ -42,7 +43,8 @@ def _evaluate_individual(agent, individual, gen, config, toolbox, n_runs=1):
 def evaluate(population, agent, gen, config, toolbo):
 
     fitness_list = []
-    for individual in population:
+    for i, individual in enumerate(population):
+        # print(i)
         fitness = _evaluate_individual(agent, individual, gen, config, toolbo)
         fitness_list.append(fitness)
 

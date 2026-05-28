@@ -52,7 +52,7 @@ def init_primitives(pset):
     pset.addTerminal("hmap", np.ndarray, "Height_Map")  # bin space coordinate y
     pset.addTerminal("amap", np.ndarray, "Action_Map")  # bin space coordinate z
     pset.addTerminal(
-        "imap", np.ndarray, "Item_Map"
+        "imap", np.float64, "Item_Map"
     )  # the width of the item to be packed
 
 

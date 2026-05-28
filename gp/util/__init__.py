@@ -20,12 +20,50 @@ def protected_div(left, right):
     return x
 
 
+def protected_mat_div(left, right):
+    with np.errstate(divide="ignore", invalid="ignore"):
+        x = np.divide(left, right)
+        if isinstance(x, np.ndarray):
+            x[np.isinf(x)] = 1
+            x[np.isnan(x)] = 1
+    return x
+
+
+def protected_mat_scalar_div(left, right):
+    if abs(right) < 1e-12:
+        return left
+    return left / right
+
+
+def mat_where(mask, mat_true, mat_false):
+    return np.where(mask > 0, mat_true, mat_false)
+
+
 def init_primitives(pset):
     # --- Matrix-to-Matrix Primitives ---
     # These let the tree process, blend, or compare the image inputs first
     pset.addPrimitive(np.add, [np.ndarray, np.ndarray], np.ndarray, name="MatAdd")
     pset.addPrimitive(np.subtract, [np.ndarray, np.ndarray], np.ndarray, name="MatSub")
+    pset.addPrimitive(np.multiply, [np.ndarray, np.ndarray], np.ndarray, name="MatMulElem")
+    pset.addPrimitive(
+        protected_mat_div, [np.ndarray, np.ndarray], np.ndarray, name="MatDivElem"
+    )
+    pset.addPrimitive(np.maximum, [np.ndarray, np.ndarray], np.ndarray, name="MatElemMax")
+    pset.addPrimitive(np.minimum, [np.ndarray, np.ndarray], np.ndarray, name="MatElemMin")
     pset.addPrimitive(np.absolute, [np.ndarray], np.ndarray, name="MatAbs")
+    pset.addPrimitive(np.tanh, [np.ndarray], np.ndarray, name="MatTanh")
+    pset.addPrimitive(
+        mat_where, [np.ndarray, np.ndarray, np.ndarray], np.ndarray, name="MatWhere"
+    )
+
+    # --- Matrix-Scalar Primitives ---
+    # These preserve matrix shape while introducing scalar controls
+    pset.addPrimitive(np.add, [np.ndarray, float], np.ndarray, name="MatScalarAdd")
+    pset.addPrimitive(np.subtract, [np.ndarray, float], np.ndarray, name="MatScalarSub")
+    pset.addPrimitive(np.multiply, [np.ndarray, float], np.ndarray, name="MatScalarMul")
+    pset.addPrimitive(
+        protected_mat_scalar_div, [np.ndarray, float], np.ndarray, name="MatScalarDiv"
+    )
 
     # --- Matrix-to-Scalar Bridge Primitives ---
     # These collapse a 2D image matrix down into a single float constant

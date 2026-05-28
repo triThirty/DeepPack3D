@@ -4,7 +4,7 @@ from rl.split_gen import reset_rng
 
 
 def _evaluate_once(agent, individual, gen, config, toolbox):
-    reset_rng(seed=config.seed * gen * 27)
+    reset_rng(seed=config.seed * gen)
     state = agent.env.reset()
 
     # step = 0
@@ -13,9 +13,7 @@ def _evaluate_once(agent, individual, gen, config, toolbox):
         items, h_map, actions = state
         state_map = agent.Q_inputs(state)
 
-        action = GP_action_selector(
-            state_map, actions, individual[0], toolbox
-        )
+        action = GP_action_selector(state_map, actions, individual[0], toolbox)
         next_state, reward, done = agent.env.step(action)
         return_v += reward
         # for i, packer in enumerate(agent.env.packers):

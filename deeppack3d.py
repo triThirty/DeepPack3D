@@ -212,14 +212,16 @@ def deeppack3d(
             # dict_best_MTGP_individuals = load_individual_from_gen(cfg)
             dict_best_MTGP_individuals_dict = load_individual_from_gen_json_format(cfg)
 
-            testSeeds = 123453
-            np.random.seed(int(testSeeds))
-
-            pset = deap_gp.PrimitiveSet("MAIN", 0, prefix="f")
-            pset.context["array"] = np.array
             from gp.util import init_primitives
-
+            from deap import base
+            pset = deap_gp.PrimitiveSetTyped(
+                "MAIN", [np.ndarray, np.ndarray, np.ndarray, float], float, prefix="f"
+            )
+            pset.renameArguments(f0="Constant", f1="Height_Map", f2="Action_Map", f3="Item_Map")
+            pset.context["array"] = np.array
             init_primitives(pset)
+            toolbox = base.Toolbox()
+            toolbox.register("compile", deap_gp.compile, pset=pset)
 
             agent = Agent(
                 env,
@@ -229,7 +231,7 @@ def deeppack3d(
                 batch_size=batch_size,
             )
             for run in range(cfg.evaluation_iterations):
-                seed = np.random.randint(2000000000)
+                seed = np.random.randint(2000000)
                 print(
                     "******************* ITERATION-{} on SEED-{} *******************".format(
                         run, seed
@@ -246,8 +248,9 @@ def deeppack3d(
                         [
                             rule,
                         ],
-                        gen=123453,
+                        gen=seed,
                         config=cfg,
+                        toolbox=toolbox,
                     )
                     individual["fitness"] += fitness_value
 

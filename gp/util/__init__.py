@@ -84,7 +84,7 @@ def init_primitives(pset):
 
     # --- Constant Terminals ---
     # Add random floating-point constants directly into the tree mix
-    pset.addEphemeralConstant("rand101", lambda: random.uniform(-1.0, 1.0), float)
+    # pset.addEphemeralConstant("rand101", lambda: random.uniform(-1.0, 1.0), float)
 
     pset.addTerminal("constance", np.ndarray, "Constant")
     pset.addTerminal("hmap", np.ndarray, "Height_Map")

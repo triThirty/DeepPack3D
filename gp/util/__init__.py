@@ -184,7 +184,7 @@ def record(
         halloffame.update(population)
 
     pop_fit = [ind.fitness.values[0] for ind in population]
-    best_index = np.argmin(pop_fit)
+    best_index = np.argmax(pop_fit)
     best_ind_all_gen.append(population[best_index])
     p_one = population[best_index]
     saveFile.save_individual_each_gen_to_txt(config, p_one, gen)

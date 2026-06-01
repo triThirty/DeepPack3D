@@ -214,10 +214,13 @@ def deeppack3d(
 
             from gp.util import init_primitives
             from deap import base
+
             pset = deap_gp.PrimitiveSetTyped(
                 "MAIN", [np.ndarray, np.ndarray, np.ndarray, float], float, prefix="f"
             )
-            pset.renameArguments(f0="Constant", f1="Height_Map", f2="Action_Map", f3="Item_Map")
+            pset.renameArguments(
+                f0="Constant", f1="Height_Map", f2="Action_Map", f3="Item_Map"
+            )
             pset.context["array"] = np.array
             init_primitives(pset)
             toolbox = base.Toolbox()
@@ -241,9 +244,9 @@ def deeppack3d(
                 for idx, individual in enumerate(dict_best_MTGP_individuals_dict):
                     rule_string = individual.get("T0")
                     rule = deap_gp.PrimitiveTree.from_string(rule_string, pset=pset)
-                    from gp.evaluate import _evaluate_individual
+                    from gp.evaluate import _space_utilization_evaluate_once
 
-                    fitness_value = _evaluate_individual(
+                    fitness_value = _space_utilization_evaluate_once(
                         agent,
                         [
                             rule,

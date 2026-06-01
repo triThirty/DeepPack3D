@@ -70,7 +70,7 @@ def save_each_gen_best_individual_json_format(config, best_ind_all_gen):
             {
                 "T0": str(ind[0]),
                 # "T1": str(ind[1]),
-                "fitness": 0,
+                "fitness": ind.fitness.values[0] if hasattr(ind, "fitness") else 0,
             }
         )
 

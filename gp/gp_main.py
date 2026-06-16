@@ -10,13 +10,17 @@ from .evolution import evolve
 
 def GPFC_main(config, agent):
     num_features = 0
-    pset = gp.PrimitiveSet("MAIN", num_features, prefix="f")
+    pset = gp.PrimitiveSetTyped(
+        "MAIN", [np.ndarray, np.ndarray, np.ndarray, float], float, prefix="f"
+    )
+    pset.renameArguments(f0="Constant", f1="Height_Map", f2="Action_Map", f3="Item_Map")
     pset.context["array"] = np.array
     init_primitives(pset)
 
     toolbox = base.Toolbox()
     init_toolbox(toolbox, pset, config)
     toolbox.register("evaluate", evaluate)
+    toolbox.register("compile", gp.compile, pset=pset)
 
     pop = toolbox.population(n=config.POP_SIZE)
     stats = init_stats()

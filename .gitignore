@@ -167,3 +167,4 @@ cython_debug/
 
 # Vscode
 .vscode/
+/.3d

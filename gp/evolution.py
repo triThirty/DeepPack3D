@@ -44,7 +44,7 @@ def evolve(population, agent, toolbox, stats, hof, config):
     # Begin the generational process
     for gen in range(1, config.NGEN + 1):
         # Step 3: Full Fitness Evaluation
-        fitnesses = toolbox.evaluate(population, agent, gen, config)
+        fitnesses = toolbox.evaluate(population, agent, gen, config, toolbox)
         for ind, fit in zip(population, fitnesses):
             ind.fitness.values = (fit,)
         del fitnesses  # Release memory

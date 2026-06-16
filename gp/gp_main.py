@@ -10,7 +10,6 @@ from .evolution import evolve
 
 def GPFC_main(config, agent):
     num_features = 0
-    # pset = gp.PrimitiveSet("MAIN", num_features, prefix="f")
     pset = gp.PrimitiveSetTyped(
         "MAIN", [np.ndarray, np.ndarray, np.ndarray, float], float, prefix="f"
     )

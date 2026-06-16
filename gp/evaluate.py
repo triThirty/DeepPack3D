@@ -16,16 +16,11 @@ def _evaluate_once(agent, individual, gen, config, toolbox):
         action = GP_action_selector(state_map, actions, individual[0], toolbox)
         next_state, reward, done = agent.env.step(action)
         return_v += reward
-        # for i, packer in enumerate(agent.env.packers):
-        #     packer.render().savefig(f"./outputs/{step}_{i}.jpg")
-        # print(f"gen: {gen}, step: {step}, action: {action}, reward: {reward}, return: {return_v}")
-        # step += 1
 
         if done:
             break
         state = next_state
 
-    # return agent.env.used_packers[0].space_utilization() * 100
     return return_v
 
 

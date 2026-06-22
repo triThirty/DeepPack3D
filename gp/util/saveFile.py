@@ -14,6 +14,7 @@ def ensure_directory_exists(file_path_arg_name):
             bound_args.apply_defaults()
 
             config = bound_args.arguments["config"]
+            config["seed"] = config["--seed"]
             file_path = file_path_arg_name.substitute(**config)
 
             file_path = Path(file_path)
@@ -35,8 +36,8 @@ base_dir = Template(f"{root_dir}/${{seed}}_individual.json")
 txt_base_dir = Template(f"{root_dir}/${{seed}}_each_gen.txt")
 
 surrogate_accuracy_dir = Template(f"{root_dir}/${{seed}}_accuracy_trend.json")
-save_rl_utils_dir = Template(r"./data/rl/rl_utils.json")
-save_rl_rewards_dir = Template(r"./data/rl/rl_rewards.json")
+save_rl_utils_dir = Template(f"./data/rl/rl_${{seed}}_utils.json")
+save_rl_rewards_dir = Template(f"./data/rl/rl_${{seed}}_rewards.json")
 surrogate_proportion_index_dir = Template(f"{root_dir}/${{seed}}_proportion_index.txt")
 
 

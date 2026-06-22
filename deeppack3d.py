@@ -3,7 +3,7 @@ import os
 import shutil
 import time
 
-# import seaborn as sns
+import seaborn as sns
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from omegaconf import DictConfig, OmegaConf
@@ -173,17 +173,23 @@ def deeppack3d(
         elif method == "gp":
             gp.main(cfg, agent)
 
-        data = np.asarray([utils for utils, n_bins, ep_reward in agent.ep_history])
-        # y = np.ones(100)
-        # data = np.convolve(data, y, 'valid') / len(y)
-        # sns.lineplot(data=data)
+        data = (
+            np.asarray([utils for utils, n_bins, ep_reward in agent.ep_history])
+            .flatten()
+            .astype(float)
+        )
+        saveFile.save_rl_utils(cfg, data.tolist())
+        y = np.ones(100)
+        data = np.convolve(data, y, "valid") / len(y)
+        sns.lineplot(data=data)
         plt.savefig("./util.jpg")
         plt.show()
 
         data = np.asarray([ep_reward for utils, n_bins, ep_reward in agent.ep_history])
-        # y = np.ones(100)
-        # data = np.convolve(data, y, 'valid') / len(y)
-        # sns.lineplot(data=data)
+        saveFile.save_rl_rewards(cfg, data.tolist())
+        y = np.ones(100)
+        data = np.convolve(data, y, "valid") / len(y)
+        sns.lineplot(data=data)
         plt.savefig("./ep_reward.jpg")
         plt.show()
 

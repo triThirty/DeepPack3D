@@ -31,9 +31,9 @@ def ensure_directory_exists(file_path_arg_name):
 # root_dir = r"./data/${algo}_${path_surfix}/scenario_${scenarios}"
 root_dir = r"./data/${algo}"
 
-formula_base_dir = Template(f"{root_dir}/${{seed}}_formula_format.json")
-base_dir = Template(f"{root_dir}/${{seed}}_individual.json")
-txt_base_dir = Template(f"{root_dir}/${{seed}}_each_gen.txt")
+formula_base_dir = Template(f"{root_dir}/${{lookahead}}/${{seed}}_formula_format.json")
+base_dir = Template(f"{root_dir}/${{lookahead}}/${{seed}}_individual.json")
+txt_base_dir = Template(f"{root_dir}/${{lookahead}}/${{seed}}_each_gen.txt")
 
 surrogate_accuracy_dir = Template(f"{root_dir}/${{seed}}_accuracy_trend.json")
 save_rl_utils_dir = Template(f"./data/rl/rl_${{seed}}_utils.json")

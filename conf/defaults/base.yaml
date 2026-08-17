@@ -10,27 +10,27 @@ MAX_HEIGHT: 12
 N_TREES: 1
 TOURNAMENT_SIZE: 7
 
-# create the shop floor instance
-span: 1000
-m_no: 6
-wc_no: 3
-ins_each_gen: 10
+# # create the shop floor instance
+# span: 1000
+# m_no: 6
+# wc_no: 3
+# ins_each_gen: 10
 
 evaluation_iterations: 100
 # fitness_evaluation_iterations: 10
 
-HH:
-  reference_sequencing_rule: "maximum('SLACK', add(maximum(minimum('PT', maximum('SLACK', maximum(subtract('NOR', protected_div('NOR', 'TIS')), minimum(protected_div('WKR', 'OWT'), maximum('OWT', 'SLACK'))))), subtract('PT', 'NIQ')), subtract('PT', 'NIQ')))"
-  reference_routing_rule: "multiply(multiply('PT', add('PT', add(maximum('MWT', protected_div(add('WKR', 'NIQ'), maximum('NPT', 'MWT'))), maximum(maximum('MWT', 'WIQ'), add('TIS', 'NPT'))))), multiply('PT', multiply('NPT', add('PT', maximum('WKR', maximum(maximum('MWT', 'WIQ'), 'PT'))))))"
+# HH:
+#   reference_sequencing_rule: "maximum('SLACK', add(maximum(minimum('PT', maximum('SLACK', maximum(subtract('NOR', protected_div('NOR', 'TIS')), minimum(protected_div('WKR', 'OWT'), maximum('OWT', 'SLACK'))))), subtract('PT', 'NIQ')), subtract('PT', 'NIQ')))"
+#   reference_routing_rule: "multiply(multiply('PT', add('PT', add(maximum('MWT', protected_div(add('WKR', 'NIQ'), maximum('NPT', 'MWT'))), maximum(maximum('MWT', 'WIQ'), add('TIS', 'NPT'))))), multiply('PT', multiply('NPT', add('PT', maximum('WKR', maximum(maximum('MWT', 'WIQ'), 'PT'))))))"
 
-HL:
-  reference_sequencing_rule: "minimum(maximum(maximum(add(maximum('SLACK', add(minimum(subtract('PT', 'MWT'), protected_div('NOR', 'NPT')), 'SLACK')), add(subtract(subtract(multiply('MWT', 'MWT'), multiply('TIS', 'NOR')), subtract('PT', 'NOR')), minimum(add(maximum('SLACK', 'PT'), protected_div('MWT', 'MWT')), minimum(minimum('NOR', 'TIS'), subtract('PT', 'OWT'))))), 'SLACK'), multiply(maximum('PT', 'SLACK'), 'SLACK')), 'SLACK')"
-  reference_routing_rule: "add('PT', multiply(multiply(multiply('PT', maximum(subtract(add('PT', 'MWT'), multiply('PT', 'SLACK')), add(maximum('SLACK', 'NIQ'), minimum('TIS', 'SLACK')))), maximum(subtract(add('SLACK', 'MWT'), multiply('PT', 'SLACK')), add(maximum('SLACK', 'NIQ'), minimum('TIS', 'SLACK')))), protected_div('WIQ', add(maximum('SLACK', 'NIQ'), minimum('TIS', multiply('WIQ', multiply('PT', 'NIQ')))))))"
+# HL:
+#   reference_sequencing_rule: "minimum(maximum(maximum(add(maximum('SLACK', add(minimum(subtract('PT', 'MWT'), protected_div('NOR', 'NPT')), 'SLACK')), add(subtract(subtract(multiply('MWT', 'MWT'), multiply('TIS', 'NOR')), subtract('PT', 'NOR')), minimum(add(maximum('SLACK', 'PT'), protected_div('MWT', 'MWT')), minimum(minimum('NOR', 'TIS'), subtract('PT', 'OWT'))))), 'SLACK'), multiply(maximum('PT', 'SLACK'), 'SLACK')), 'SLACK')"
+#   reference_routing_rule: "add('PT', multiply(multiply(multiply('PT', maximum(subtract(add('PT', 'MWT'), multiply('PT', 'SLACK')), add(maximum('SLACK', 'NIQ'), minimum('TIS', 'SLACK')))), maximum(subtract(add('SLACK', 'MWT'), multiply('PT', 'SLACK')), add(maximum('SLACK', 'NIQ'), minimum('TIS', 'SLACK')))), protected_div('WIQ', add(maximum('SLACK', 'NIQ'), minimum('TIS', multiply('WIQ', multiply('PT', 'NIQ')))))))"
 
-LH:
-  reference_sequencing_rule: "maximum('SLACK', 'PT')"
-  reference_routing_rule: "minimum(subtract(multiply(multiply('PT', subtract(multiply(multiply('PT', 'MWT'), protected_div('MWT', 'MWT')), 'MWT')), protected_div('MWT', 'MWT')), multiply(maximum('TIS', 'NIQ'), 'MWT')), 'PT')"
+# LH:
+#   reference_sequencing_rule: "maximum('SLACK', 'PT')"
+#   reference_routing_rule: "minimum(subtract(multiply(multiply('PT', subtract(multiply(multiply('PT', 'MWT'), protected_div('MWT', 'MWT')), 'MWT')), protected_div('MWT', 'MWT')), multiply(maximum('TIS', 'NIQ'), 'MWT')), 'PT')"
 
-LL:
-  reference_sequencing_rule: "add(maximum('SLACK', add(add('PT', add('PT', protected_div('WIQ', protected_div(add('PT', 'WIQ'), protected_div('SLACK', 'NOR'))))), add('PT', protected_div('PT', protected_div(add('MWT', 'PT'), protected_div('SLACK', 'NOR')))))), 'WIQ')"
-  reference_routing_rule: "add(maximum(multiply('PT', multiply(multiply('PT', multiply('PT', maximum(multiply('PT', 'MWT'), 'MWT'))), maximum(multiply('PT', 'MWT'), 'MWT'))), 'WIQ'), 'WIQ')"
+# LL:
+#   reference_sequencing_rule: "add(maximum('SLACK', add(add('PT', add('PT', protected_div('WIQ', protected_div(add('PT', 'WIQ'), protected_div('SLACK', 'NOR'))))), add('PT', protected_div('PT', protected_div(add('MWT', 'PT'), protected_div('SLACK', 'NOR')))))), 'WIQ')"
+#   reference_routing_rule: "add(maximum(multiply('PT', multiply(multiply('PT', multiply('PT', maximum(multiply('PT', 'MWT'), 'MWT'))), maximum(multiply('PT', 'MWT'), 'MWT'))), 'WIQ'), 'WIQ')"

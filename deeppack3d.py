@@ -170,28 +170,29 @@ def deeppack3d(
                 start_time = time.time()
                 yield from agent.run(100, verbose=verbose > 1)
                 agent.eps = max(agent.eps * 0.95, 0.025)
+                data = (
+                    np.asarray([utils for utils, n_bins, ep_reward in agent.ep_history])
+                    .flatten()
+                    .astype(float)
+                )
+                saveFile.save_rl_utils(cfg, data.tolist())
+                y = np.ones(100)
+                data = np.convolve(data, y, "valid") / len(y)
+                sns.lineplot(data=data)
+                plt.savefig("./util.jpg")
+                plt.show()
+
+                data = np.asarray(
+                    [ep_reward for utils, n_bins, ep_reward in agent.ep_history]
+                )
+                saveFile.save_rl_rewards(cfg, data.tolist())
+                y = np.ones(100)
+                data = np.convolve(data, y, "valid") / len(y)
+                sns.lineplot(data=data)
+                plt.savefig("./ep_reward.jpg")
+                plt.show()
         elif method == "gp":
             gp.main(cfg, agent)
-
-        data = (
-            np.asarray([utils for utils, n_bins, ep_reward in agent.ep_history])
-            .flatten()
-            .astype(float)
-        )
-        saveFile.save_rl_utils(cfg, data.tolist())
-        y = np.ones(100)
-        data = np.convolve(data, y, "valid") / len(y)
-        sns.lineplot(data=data)
-        plt.savefig("./util.jpg")
-        plt.show()
-
-        data = np.asarray([ep_reward for utils, n_bins, ep_reward in agent.ep_history])
-        saveFile.save_rl_rewards(cfg, data.tolist())
-        y = np.ones(100)
-        data = np.convolve(data, y, "valid") / len(y)
-        sns.lineplot(data=data)
-        plt.savefig("./ep_reward.jpg")
-        plt.show()
 
         if method == "rl":
             import uuid

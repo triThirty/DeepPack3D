@@ -45,7 +45,7 @@ def evaluate(population, agent, gen, config, toolbo):
 
 
 def _space_utilization_evaluate_once(agent, individual, gen, config, toolbox):
-    reset_rng(seed=config.seed * gen)
+    reset_rng(seed=gen)
     state = agent.env.reset()
 
     while True:

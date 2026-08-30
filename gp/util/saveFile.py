@@ -40,7 +40,9 @@ save_rl_utils_dir = Template(f"./data/rl/rl_${{seed}}_utils.json")
 save_rl_rewards_dir = Template(f"./data/rl/rl_${{seed}}_rewards.json")
 surrogate_proportion_index_dir = Template(f"{root_dir}/${{seed}}_proportion_index.txt")
 
-save_heuristic_utils_dir = Template(f"./data/${{method}}/heuristic_${{seed}}_utils.json")
+save_heuristic_utils_dir = Template(
+    f"./data/${{method}}/${{lookahead}}/${{seed}}_formula_format.json"
+)
 
 
 @ensure_directory_exists(save_heuristic_utils_dir)

@@ -274,6 +274,27 @@ def deeppack3d(
             agent = HeuristicAgent(
                 heuristics[method], env, verbose=verbose > 0, visualize=visualize
             )
+            space_utilization_list = []
+            for run in range(cfg.evaluation_iterations):
+                seed = np.random.randint(2000000)
+                print(
+                    "******************* ITERATION-{} on SEED-{} *******************".format(
+                        run, seed
+                    )
+                )
+
+                from gp.evaluate import _space_utilization_evaluate_once
+
+                fitness_value = _space_utilization_evaluate_once(
+                    agent,
+                    individual=[],
+                    gen=seed,
+                    config=cfg,
+                    gp=False,
+                )
+                space_utilization_list.append(fitness_value)
+
+            saveFile.save_heuristic_utils(cfg, space_utilization_list)
 
         start_time = time.time()
 
@@ -329,7 +350,14 @@ def main():
     if args.method == "gp":
         cfg = merge_conf(cli_conf)
     else:
-        cfg = cli_conf
+        base_conf = OmegaConf.load("conf/defaults/base.yaml")
+        conf = OmegaConf.merge(base_conf, cli_conf)
+        conf.seed = cli_conf.get("--seed", None)
+        conf.lookahead = cli_conf.get("--lookahead", None)
+        conf.method = cli_conf.get("--method", None)
+        conf.train = cli_conf.get("--train", None)
+        conf.verbose = cli_conf.get("--verbose", None)
+        cfg = conf
     for _ in deeppack3d(
         cfg,
         args.method,

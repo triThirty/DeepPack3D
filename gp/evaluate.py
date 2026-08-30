@@ -44,15 +44,20 @@ def evaluate(population, agent, gen, config, toolbo):
     return fitness_list
 
 
-def _space_utilization_evaluate_once(agent, individual, gen, config, toolbox):
+def _space_utilization_evaluate_once(
+    agent, individual=[], gen=1, config={}, toolbox=None, gp=True
+):
     reset_rng(seed=gen)
     state = agent.env.reset()
 
     while True:
-        items, h_map, actions = state
-        state_map = agent.Q_inputs(state)
 
-        action = GP_action_selector(state_map, actions, individual[0], toolbox)
+        if gp:
+            items, h_map, actions = state
+            state_map = agent.Q_inputs(state)
+            action = GP_action_selector(state_map, actions, individual[0], toolbox)
+        else:
+            action = agent.select(state)
         next_state, reward, done = agent.env.step(action)
 
         if done:

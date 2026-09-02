@@ -28,7 +28,10 @@ def _evaluate_individual(agent, individual, gen, config, toolbox, n_runs=1):
     total_fitness = 0.0
 
     for _ in range(n_runs):
-        total_fitness += _evaluate_once(agent, individual, gen, config, toolbox)
+        # total_fitness += _evaluate_once(agent, individual, gen, config, toolbox)
+        total_fitness += _space_utilization_evaluate_once(
+            agent, individual, gen, config, toolbox
+        )
 
     return round(total_fitness / n_runs, 4)
 

@@ -102,6 +102,14 @@ def parse_args():
         help="enable visualization mode (default: False).",
     )
 
+    parser.add_argument(
+        "--model_path",
+        metavar="",
+        type=str,
+        default=None,
+        help='set the RL model path to save to (training) or load from (testing), only used if method is "rl" (default: ./models/k={lookahead}.keras).',
+    )
+
     return parser.parse_args()
 
 
@@ -126,8 +134,12 @@ def deeppack3d(
     train=False,
     visualize=False,
     batch_size=32,
+    model_path=None,
 ):
     reset_rng(seed)
+
+    if model_path is None:
+        model_path = f"./models/k={lookahead}.keras"
 
     env = MultiBinPackerEnv(
         n_bins=1,
@@ -194,17 +206,19 @@ def deeppack3d(
             gp.main(cfg, agent)
 
         if method == "rl":
-            import uuid
-
-            uid = uuid.uuid4()
-            print(f"saved model at ./{uid}.keras")
-            agent.q_net.save(f"{uid}.keras")
+            os.makedirs(os.path.dirname(model_path) or ".", exist_ok=True)
+            agent.q_net.save(model_path)
+            print(f"saved model at {model_path}")
     else:
         if verbose > 0:
             print(f'Testing with method "{method}" and lookahead {lookahead}...')
 
         if method == "rl":
-            model_path = f"./models/k={lookahead}.h5"
+            if not os.path.exists(model_path):
+                raise FileNotFoundError(
+                    f"RL model not found at {model_path}. Train one with --train, "
+                    f"or pass --model_path to an existing .keras/.h5 model."
+                )
             agent = Agent(
                 env,
                 train=False,
@@ -390,6 +404,7 @@ def main():
         path=args.path,
         visualize=args.visualize,
         batch_size=args.batch_size,
+        model_path=args.model_path,
     ):
         pass
 

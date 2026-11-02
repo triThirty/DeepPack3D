@@ -82,6 +82,8 @@ python deeppack3d.py bl 5 --n_iterations=-1 --data=file --path=./input.txt --ver
     - Default: `32`.
 - `--visualize`: Enable visualization mode. 
     - Default: `False`.
+- `--model_path`: RL model path to save to when training or load from when testing (used only with `method=rl`). 
+    - Default: `./models/k={lookahead}.keras`.
 
 ### Library
 You can also import DeepPack3D as a Python library to integrate with other systems or workflows.

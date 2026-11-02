@@ -214,6 +214,30 @@ def deeppack3d(
             )
             agent.q_net = tf.keras.models.load_model(model_path, compile=False)
             agent.eps = 0.0
+            from gp.evaluate import _space_utilization_evaluate_once
+
+            space_utilization_list = []
+            for run in range(cfg.evaluation_iterations):
+                seed = np.random.randint(2000000)
+                print(
+                    f"******************* ITERATION-{run} on SEED-{seed} *******************"
+                )
+
+                fitness_value = _space_utilization_evaluate_once(
+                    agent,
+                    individual=[],
+                    gen=seed,
+                    config=cfg,
+                    gp=False,
+                )
+                space_utilization_list.append(fitness_value)
+
+            print(
+                f"RL average space utilization over {cfg.evaluation_iterations} runs: "
+                f"{np.mean(space_utilization_list):.2f}%"
+            )
+            saveFile.save_heuristic_utils(cfg, space_utilization_list)
+
         elif method == "gp":
             # dict_best_MTGP_individuals = load_individual_from_gen(cfg)
             dict_best_MTGP_individuals_dict = load_individual_from_gen_json_format(cfg)

@@ -1,5 +1,6 @@
 from .util.sequencing import GP_action_selector
 
+from rl.agent import Agent
 from rl.split_gen import reset_rng
 
 
@@ -61,6 +62,9 @@ def _space_utilization_evaluate_once(
             action = GP_action_selector(state_map, actions, individual[0], toolbox)
         else:
             action = agent.select(state)
+            # RL Agent.select returns (action, q_value); heuristics return the action only
+            if isinstance(agent, Agent):
+                action = action[0]
         next_state, reward, done = agent.env.step(action)
 
         if done:

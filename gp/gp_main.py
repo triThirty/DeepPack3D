@@ -1,11 +1,12 @@
 # import simpy
 import time
-from deap import base, gp, tools
-import numpy as np
 
-from .util import init_primitives, init_stats, init_toolbox, saveFile
+import numpy as np
+from deap import base, gp, tools
+
 from .evaluate import evaluate
 from .evolution import evolve
+from .util import init_primitives, init_stats, init_toolbox, saveFile
 
 
 def GPFC_main(config, agent):

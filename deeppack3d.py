@@ -1,28 +1,27 @@
-import numpy as np
 import os
 import shutil
 import time
 
-import seaborn as sns
 import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
 import tensorflow as tf
-from omegaconf import DictConfig, OmegaConf
 from deap import gp as deap_gp
-
-from rl.env import MultiBinPackerEnv
-from rl.conveyor import FileConveyor, InputConveyor
-from rl.agent import (
-    bottom_left,
-    best_area_fit,
-    best_short_side_fit,
-    best_long_side_fit,
-    Agent,
-    HeuristicAgent,
-)
-from rl.split_gen import reset_rng
+from omegaconf import DictConfig, OmegaConf
 
 from gp import gp_main as gp
-from gp.util import saveFile, load_individual_from_gen_json_format
+from gp.util import load_individual_from_gen_json_format, saveFile
+from rl.agent import (
+    Agent,
+    HeuristicAgent,
+    best_area_fit,
+    best_long_side_fit,
+    best_short_side_fit,
+    bottom_left,
+)
+from rl.conveyor import FileConveyor, InputConveyor
+from rl.env import MultiBinPackerEnv
+from rl.split_gen import reset_rng
 
 
 def parse_args():
@@ -219,8 +218,9 @@ def deeppack3d(
             # dict_best_MTGP_individuals = load_individual_from_gen(cfg)
             dict_best_MTGP_individuals_dict = load_individual_from_gen_json_format(cfg)
 
-            from gp.util import init_primitives
             from deap import base
+
+            from gp.util import init_primitives
 
             pset = deap_gp.PrimitiveSetTyped(
                 "MAIN", [np.ndarray, np.ndarray, np.ndarray, float], float, prefix="f"
@@ -243,9 +243,7 @@ def deeppack3d(
             for run in range(cfg.evaluation_iterations):
                 seed = np.random.randint(2000000)
                 print(
-                    "******************* ITERATION-{} on SEED-{} *******************".format(
-                        run, seed
-                    )
+                    f"******************* ITERATION-{run} on SEED-{seed} *******************"
                 )
 
                 for idx, individual in enumerate(dict_best_MTGP_individuals_dict):
@@ -278,9 +276,7 @@ def deeppack3d(
             for run in range(cfg.evaluation_iterations):
                 seed = np.random.randint(2000000)
                 print(
-                    "******************* ITERATION-{} on SEED-{} *******************".format(
-                        run, seed
-                    )
+                    f"******************* ITERATION-{run} on SEED-{seed} *******************"
                 )
 
                 from gp.evaluate import _space_utilization_evaluate_once

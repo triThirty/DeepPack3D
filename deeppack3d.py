@@ -248,7 +248,8 @@ def deeppack3d(
 
             print(
                 f"RL average space utilization over {cfg.evaluation_iterations} runs: "
-                f"{np.mean(space_utilization_list):.2f}%"
+                f"{np.mean(space_utilization_list):.2f}% "
+                f"(std: {np.std(space_utilization_list):.2f})"
             )
             saveFile.save_heuristic_utils(cfg, space_utilization_list)
 

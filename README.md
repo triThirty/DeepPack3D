@@ -72,6 +72,8 @@ python deeppack3d.py bl 5 --n_iterations=-1 --data=file --path=./input.txt --ver
     - Default: `None`.
 - `--n_iterations`: Number of iterations (used only if `--data=generated`). 
     - Default: `100`.
+- `--n_episodes`: Number of episodes per training iteration; epsilon decays after each iteration (used only with `method=rl` and `--train`). 
+    - Default: `100`.
 - `--seed`: Random seed for reproducibility (used only if `--data=generated`). 
     - Default: `None`.
 - `--verbose`: Verbose level (`0` for silent, `1` for standard, `2` for detailed). 

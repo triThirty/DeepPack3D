@@ -67,6 +67,14 @@ def parse_args():
     )
 
     parser.add_argument(
+        "--n_episodes",
+        metavar="",
+        type=int,
+        default=100,
+        help='set the number of episodes per training iteration (epsilon decays after each iteration), only used if method is "rl" and train is True (default: 100).',
+    )
+
+    parser.add_argument(
         "--seed",
         metavar="",
         type=int,
@@ -127,6 +135,7 @@ def deeppack3d(
     lookahead,
     *,
     n_iterations=100,
+    n_episodes=100,
     seed=None,
     verbose=1,
     data="generated",
@@ -179,7 +188,7 @@ def deeppack3d(
             for i in range(n_iterations):
                 print(f"Iteration {i}")
                 start_time = time.time()
-                yield from agent.run(100, verbose=verbose > 1)
+                yield from agent.run(n_episodes, verbose=verbose > 1)
                 agent.eps = max(agent.eps * 0.95, 0.025)
                 data = (
                     np.asarray([utils for utils, n_bins, ep_reward in agent.ep_history])
@@ -398,6 +407,7 @@ def main():
         args.method,
         args.lookahead,
         n_iterations=args.n_iterations,
+        n_episodes=args.n_episodes,
         seed=args.seed,
         train=args.train,
         verbose=args.verbose,

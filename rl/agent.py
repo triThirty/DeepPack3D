@@ -179,34 +179,32 @@ class Agent:
         W, H, D = self.env.size
 
         items, h_maps, actions = state
-        if action is None:
-            action_space = indices(actions)
-        else:
-            i, j, k = action
-            action_space = [(i, j, k)]
+        rows = actions if action is None else actions[[action]]
+        rows = rows.astype(np.int64)
 
-        imaps = [self.env.i_map(i, items) for i in range(len(self.env.packers))]
+        item_idx, bin_idx = rows[:, A_ITEM], rows[:, A_BIN]
+        x, y, z, w, h, d = (rows[:, c] for c in range(A_X, A_D + 1))
 
-        hmap_in = []
-        amap_in = []
-        imap_in = []
+        # height map of the target bin with the placed item's top raised
+        base = h_maps[bin_idx].astype(np.float64)
+        zs = np.arange(base.shape[1])
+        xs = np.arange(base.shape[2])
+        in_z = (zs >= z[:, None]) & (zs < (z + d)[:, None])
+        in_x = (xs >= x[:, None]) & (xs < (x + w)[:, None])
+        mask = in_z[:, :, None] & in_x[:, None, :]
+        amap_in = np.where(mask, (y + h)[:, None, None], base) / H
 
-        # item, bin, rotation_placement
-        for i, j, k in action_space:
-            _, (x, y, z), (w, h, d), _ = actions[i][j][k]
-            amap = self.env.p_map(j, (x, y, z, w, h, d))
-            amap = np.where(amap == 0, h_maps[j], y + h) / H
+        hmap_in = np.empty_like(amap_in)
+        hmap_in[:] = amap_in.max(axis=(1, 2), initial=0.0)[:, None, None]
 
-            hmap = np.full(h_maps[j].shape, np.amax(amap))
+        # item maps of the target bin without the selected item
+        imaps = np.stack(
+            [self.env.i_map(b, items) for b in range(len(self.env.packers))]
+        )
+        others = np.arange(len(items) - 1)
+        others = others + (others >= item_idx[:, None])
+        imap_in = imaps[bin_idx[:, None], others]
 
-            imap = imaps[j][np.arange(len(items)) != i]
-            #             print(hmap, amap, imap)
-
-            hmap_in.append(hmap)
-            amap_in.append(amap)
-            imap_in.append(imap)
-
-        hmap_in, amap_in, imap_in = map(np.asarray, (hmap_in, amap_in, imap_in))
         hmap_in = hmap_in[..., None]
         amap_in = amap_in[..., None]
         const_in = np.ones(hmap_in.shape)
@@ -339,9 +337,9 @@ class Agent:
                 if verbose:
                     print(f"possible actions: {len(actions)}")
                     print(f"action: {action}")
-                    print(f"placement: {actions[action[0]][action[1]][action[2]]}")
+                    print(f"placement: {placement(actions, action)}")
 
-                yield actions[action[0]][action[1]][action[2]]
+                yield placement(actions, action)
 
                 next_state, reward, done = self.env.step(action)
 
@@ -449,9 +447,9 @@ class HeuristicAgent:
                 if verbose:
                     print(f"actions: {actions}")
                     print(f"reward: {reward}, done: {done}")
-                    print(f"placement: {actions[action[0]][action[1]][action[2]]}")
+                    print(f"placement: {placement(actions, action)}")
 
-                yield actions[action[0]][action[1]][action[2]]
+                yield placement(actions, action)
 
                 ep_reward += reward
 
@@ -485,80 +483,41 @@ class HeuristicAgent:
 
 
 def gp_actions_data(actions):
-    actions_data = []
-    for i, item in enumerate(actions):
-        for j, bin_ in enumerate(item):
-            for k, placement in enumerate(bin_):
-                action_data = []
-                item, (x, y, z), (w, h, d), (s_x, s_y, s_z, s_w, s_h, s_d) = placement
-                action_data.append(x)
-                action_data.append(y)
-                action_data.append(z)
-                action_data.append(w)
-                action_data.append(h)
-                action_data.append(d)
-                action_data.append(s_x)
-                action_data.append(s_y)
-                action_data.append(s_z)
-                action_data.append(s_w)
-                action_data.append(s_h)
-                action_data.append(s_d)
-                action_data.append([i, j, k])
-                actions_data.append(action_data)
-    return actions_data
+    return [
+        [int(v) for v in row[A_X : A_SD + 1]] + [a] for a, row in enumerate(actions)
+    ]
+
+
+def _first_by(*keys):
+    """Index of the lexicographically smallest key tuple, ties broken by action order."""
+    order = np.lexsort((np.arange(len(keys[0])),) + tuple(reversed(keys)))
+    return int(order[0])
+
+
+def _columns(actions):
+    rows = np.asarray(actions, dtype=np.int64)
+    return {name: rows[:, c] for name, c in (
+        ("x", A_X), ("y", A_Y), ("z", A_Z), ("w", A_W), ("h", A_H), ("d", A_D),
+        ("sw", A_SW), ("sh", A_SH), ("sd", A_SD),
+    )}
 
 
 def bottom_left(actions):
-    scores = []
-    for i, item in enumerate(actions):
-        for j, bin_ in enumerate(item):
-            for k, placement in enumerate(bin_):
-                item, (x, y, z), (w, h, d), _ = placement
-                y = y + h
-                x = x + w
-                z = z + d
-                scores.append(([y, x, z, i, j, k], [i, j, k]))
-
-    indices = sorted(range(len(scores)), key=lambda i: scores[i][0])
-    return scores[indices[0]][1]
+    c = _columns(actions)
+    return _first_by(c["y"] + c["h"], c["x"] + c["w"], c["z"] + c["d"])
 
 
 def best_short_side_fit(actions):
-    scores = []
-    for i, item in enumerate(actions):
-        for j, bin_ in enumerate(item):
-            for k, placement in enumerate(bin_):
-                item, (x, y, z), (w, h, d), split = placement
-                W, H = split.width, split.height
-                scores.append(((min(W - w, H - h), i, j, k), [i, j, k]))
-
-    #     print(scores)
-    indices = sorted(range(len(scores)), key=lambda i: scores[i][0])
-    return scores[indices[0]][1]
+    c = _columns(actions)
+    return _first_by(np.minimum(c["sw"] - c["w"], c["sh"] - c["h"]))
 
 
 def best_area_fit(actions):
-    scores = []
-    for i, item in enumerate(actions):
-        for j, bin_ in enumerate(item):
-            for k, placement in enumerate(bin_):
-                item, (x, y, z), (w, h, d), split = placement
-                W, H = split.width, split.height
-                scores.append(((split.volume, min(W - w, H - h), i, j, k), [i, j, k]))
-
-    #     print(scores)
-    indices = sorted(range(len(scores)), key=lambda i: scores[i][0])
-    return scores[indices[0]][1]
+    c = _columns(actions)
+    volume = c["sw"] * c["sh"] * c["sd"]
+    return _first_by(volume, np.minimum(c["sw"] - c["w"], c["sh"] - c["h"]))
 
 
 def best_long_side_fit(actions):
-    scores = []
-    for i, item in enumerate(actions):
-        for j, bin_ in enumerate(item):
-            for k, placement in enumerate(bin_):
-                item, (x, y, z), (w, h, d), split = placement
-                W, H = split.width, split.height
-                scores.append(((max(W - w, H - h), i, j, k), [i, j, k]))
-
-    indices = sorted(range(len(scores)), key=lambda i: scores[i][0])
-    return scores[indices[0]][1]
+    c = _columns(actions)
+    return _first_by(np.maximum(c["sw"] - c["w"], c["sh"] - c["h"]))

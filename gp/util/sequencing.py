@@ -17,5 +17,4 @@ def GP_action_selector(state_map, actions, individual, toolbox):
         actions_values.append(action_value)
     action_position = np.argmax(actions_values)
     action_space = indices(actions)
-    i, j, k = action_space[action_position]
-    return (i, j, k)
+    return action_space[action_position]

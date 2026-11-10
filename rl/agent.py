@@ -158,7 +158,7 @@ class Agent:
             self.q_net = q_net(k=env.k - 1)
             self.q_net_target = q_net(k=env.k - 1)
             self.q_optimizer = tf.keras.optimizers.Adam(learning_rate=self.warmup_lr)
-            self.memory = collections.deque(maxlen=1000000)
+            self.memory = collections.deque(maxlen=100000)
         else:
             self.q_net = None
             self.q_net_target = None
@@ -368,7 +368,7 @@ class Agent:
                 if len(self.memory) > 1000:
                     print("update model")
                     history = [
-                        self.memory[i] for i in np.random.choice(len(self.memory), 128)
+                        self.memory[i] for i in np.random.choice(len(self.memory), 16)
                     ]
                     loss = self.train(history)
 

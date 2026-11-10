@@ -1,26 +1,20 @@
-import numpy as np
+import collections
+import itertools
 
+import numpy as np
 import tensorflow as tf
 from tensorflow.keras import Input, Model
 from tensorflow.keras.layers import (
-    LeakyReLU,
-    Lambda,
-    Conv2D,
-    GlobalAveragePooling2D,
-    Flatten,
-    Dense,
-    MaxPooling2D,
-    Conv2DTranspose,
-    RepeatVector,
-    Reshape,
-    concatenate,
     BatchNormalization,
+    Conv2D,
+    Dense,
+    Flatten,
+    GlobalAveragePooling2D,
+    concatenate,
 )
 from tensorflow.keras.regularizers import l2
-from tensorflow.keras.initializers import orthogonal
 
 from rl.env import *
-import collections, itertools
 
 
 def q_net(k=1):
@@ -137,7 +131,7 @@ class Agent:
         self.eps_min = 0.05
         self.eps_decay = 0.99
 
-        self.ep_history = []
+        # self.ep_history = []
 
         self.warmup_epochs = 20
         self.warmup_lr = 1e-5
@@ -372,13 +366,13 @@ class Agent:
                     ]
                     loss = self.train(history)
 
-            self.ep_history.append(
-                (
-                    [packer.space_utilization() for packer in self.env.used_packers],
-                    self.env.used_bins,
-                    ep_reward,
-                )
-            )
+            # self.ep_history.append(
+            #     (
+            #         [packer.space_utilization() for packer in self.env.used_packers],
+            #         self.env.used_bins,
+            #         ep_reward,
+            #     )
+            # )
 
             yield None
 

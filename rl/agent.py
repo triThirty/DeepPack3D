@@ -374,13 +374,9 @@ class Agent:
 
             yield None
 
-            # utils = [
-            #     round(packer.space_utilization() * 100, 2)
-            #     for packer in self.env.used_packers
-            # ]
             if self.verbose:
                 print(
-                    f"Episode {ep}, util: {round(packer.space_utilization() * 100, 2)}, used bins: {self.env.used_bins}, ep_reward: {ep_reward:.2f}, memory: {len(self.memory) if self.memory is not None else None}, eps: {self.eps:.2f}, loss: {loss}, lr: {self.q_optimizer.learning_rate.numpy() if self.q_optimizer is not None else None}"
+                    f"Episode {ep}, util: {self.env.used_packers[0].space_utilization() * 100:.2f}, used bins: {self.env.used_bins}, ep_reward: {ep_reward:.2f}, memory: {len(self.memory) if self.memory is not None else None}, eps: {self.eps:.2f}, loss: {loss}, lr: {self.q_optimizer.learning_rate.numpy() if self.q_optimizer is not None else None}"
                 )
 
 

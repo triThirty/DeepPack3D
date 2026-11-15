@@ -360,7 +360,7 @@ class Agent:
                 if len(self.memory) > 1000:
                     print("update model")
                     history = [
-                        self.memory[i] for i in np.random.choice(len(self.memory), 16)
+                        self.memory[i] for i in np.random.choice(len(self.memory), 128)
                     ]
                     loss = self.train(history)
 
@@ -374,13 +374,13 @@ class Agent:
 
             yield None
 
-            utils = [
-                round(packer.space_utilization() * 100, 2)
-                for packer in self.env.used_packers
-            ]
+            # utils = [
+            #     round(packer.space_utilization() * 100, 2)
+            #     for packer in self.env.used_packers
+            # ]
             if self.verbose:
                 print(
-                    f"Episode {ep}, util: {utils}, used bins: {self.env.used_bins}, ep_reward: {ep_reward:.2f}, memory: {len(self.memory) if self.memory is not None else None}, eps: {self.eps:.2f}, loss: {loss}, lr: {self.q_optimizer.learning_rate.numpy() if self.q_optimizer is not None else None}"
+                    f"Episode {ep}, util: {round(packer.space_utilization() * 100, 2)}, used bins: {self.env.used_bins}, ep_reward: {ep_reward:.2f}, memory: {len(self.memory) if self.memory is not None else None}, eps: {self.eps:.2f}, loss: {loss}, lr: {self.q_optimizer.learning_rate.numpy() if self.q_optimizer is not None else None}"
                 )
 
 
@@ -496,10 +496,20 @@ def _first_by(*keys):
 
 def _columns(actions):
     rows = np.asarray(actions, dtype=np.int64)
-    return {name: rows[:, c] for name, c in (
-        ("x", A_X), ("y", A_Y), ("z", A_Z), ("w", A_W), ("h", A_H), ("d", A_D),
-        ("sw", A_SW), ("sh", A_SH), ("sd", A_SD),
-    )}
+    return {
+        name: rows[:, c]
+        for name, c in (
+            ("x", A_X),
+            ("y", A_Y),
+            ("z", A_Z),
+            ("w", A_W),
+            ("h", A_H),
+            ("d", A_D),
+            ("sw", A_SW),
+            ("sh", A_SH),
+            ("sd", A_SD),
+        )
+    }
 
 
 def bottom_left(actions):

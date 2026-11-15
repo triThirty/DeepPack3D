@@ -360,7 +360,7 @@ class Agent:
                 if len(self.memory) > 1000:
                     print("update model")
                     history = [
-                        self.memory[i] for i in np.random.choice(len(self.memory), 128)
+                        self.memory[i] for i in np.random.choice(len(self.memory), 64)
                     ]
                     loss = self.train(history)
 

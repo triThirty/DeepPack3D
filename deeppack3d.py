@@ -188,6 +188,8 @@ def deeppack3d(
                 start_time = time.time()
                 yield from agent.run(n_episodes, verbose=verbose > 1)
                 agent.eps = max(agent.eps * 0.95, 0.025)
+                agent.q_net.save(f"./models/k={lookahead}-{i}.keras")
+                print(f"saved model at ./models/k={lookahead}-{i}.keras")
                 # data = (
                 #     np.asarray([utils for utils, n_bins, ep_reward in agent.ep_history])
                 #     .flatten()
